@@ -1,0 +1,19 @@
+{
+  "filter": {
+    "fields": [ "FirstName" ],
+    "action": 1,
+    "value": [ "John", "Mary", "Doe", 23 ],
+    "ignoreCase": true
+  },
+  "sort": {
+    "field": "Id",
+    "direction": 2
+  },
+  "select": {
+    "fields": [ "FirstName", "LastName", "DOB", "Status" ]
+  },
+  "page": {
+    "skip": 2,
+    "take": 5
+  }
+}

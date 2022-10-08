@@ -26,28 +26,40 @@ First, [install NuGet](http://docs.nuget.org/docs/start-here/installing-nuget). 
 
 ## How To Use
 
-Now that you have the `QueryMakerLibrary` on your project, you can make a query using the `MakeQuery()` method as shown on the following sample:
+Now that you have the `QueryMakerLibrary` on your project, you can make a query using the `MakeQuery()` method.  as shown on the following sample:
 
   ```csharp
   // first, we create an instance of QueryMaker with the components we want to use
   // they are all optional, but for this sample we will use them all
   QueryMaker query = new QueryMaker (
-    // say we want to filter the rows in which the FirstName contains either 'John', 'Mary', 23 or null
+    // say we want to filter the users which their DateOfBirth is Greater Than Or Equal to May 1990
+    // AND their FirstName OR LastName contains 'John' or 'Doe'
     new Filter
     {
-      Fields = new string[] { "FirstName" },
-      Action = FilterActions.Contains,
-      Value = new object?[] { "John", "Mary", "Doe", 23, null },
-      IgnoreCase = true
+      Fields = new string[] { "DateOfBirth" },
+      Value = "1990-05",
+      Action = FilterActions.GreaterThanOrEqual,
+      SubFiltersOperation = FilterOperations.AndAlso,
+      SubFilters = new Filter[]
+      {
+        new Filter
+        {
+          Fields = new string[] { "FirstName", "LastName" },
+          FieldsOperation = FilterOperations.OrElse,
+          Value = new object?[] { "JOHN", "DoE" },
+          Action = FilterActions.Contains,
+          IgnoreCase = true
+        }
+      }
     },
 
-    // we also want to sort by Id on a descending direction
+    // we also want to sort them by Id on a descending direction
     new Sort("Id", SortDirections.Descending),
 
-    // then, we also want to select the following fields for the result
-    new Select(new string[] { "FirstName", "LastName", "DOB", "Status"}),
+    // then, we want to select the following fields
+    new Select(new string[] { "Id", "FirstName", "Email", "Phone" }),
 
-    // and finally, we want to page the results by skipping 2 and only taking 5
+    // and finally, we want to page the results by skipping 2 and taking 5
     new Page(2, 5));
 
   // we can then pass this query we created to the MakeQuery() method on an IQueryable instance
@@ -59,17 +71,26 @@ We can also create the same QueryMaker instance as a JSON (see [sample.json](htt
   ```json
   {
     "filter": {
-      "fields": [ "FirstName" ],
-      "action": 1,
-      "value": [ "John", "Mary", "Doe", 23 ],
-      "ignoreCase": true
+      "fields": [ "DateOfBirth" ],
+      "value": "1990-05",
+      "action": 7,
+      "subFiltersOperation": 2,
+      "subFilters": [
+        {
+          "fields": [ "FirstName", "LastName" ],
+          "fieldsOperation": 1,
+          "value": [ "JOHN", "DoE" ],
+          "action": 1,
+          "ignoreCase": true
+        }
+      ]
     },
     "sort": {
       "field": "Id",
       "direction": 2
     },
     "select": {
-      "fields": [ "FirstName", "LastName", "DOB", "Status" ]
+      "fields": [ "Id", "FirstName", "Email", "Phone" ]
     },
     "page": {
       "skip": 2,
@@ -78,7 +99,7 @@ We can also create the same QueryMaker instance as a JSON (see [sample.json](htt
   }
   ```
 
-And then receive this JSON on our API and make the query dynamically:
+And then receive this JSON on an API endpoint and make the query dynamically:
 
   ```csharp
   [HttpPost("filterUsers")]
@@ -88,12 +109,13 @@ And then receive this JSON on our API and make the query dynamically:
   }
   ```
 
-In both cases, we will have the same resulting SQL query:
+In both cases, Entity Framework will generate the following SQL query:
 
   ```sql
-  SELECT [u].[FirstName], [u].[LastName], [u].[DOB], [u].[Status]
+  SELECT [u].[Id], [u].[FirstName], [u].[Email], [u].[Phone]
   FROM [Users] AS [u]
-  WHERE (((LOWER([u].[FirstName]) LIKE N'%john%') OR (LOWER([u].[FirstName]) LIKE N'%mary%')) OR (LOWER([u].[FirstName]) LIKE N'%doe%')) OR (LOWER([u].[FirstName]) LIKE N'%23%')
+  WHERE ([u].[DateOfBirth] >= '1990-05-01T00:00:00.0000000')
+    AND ((LOWER([u].[LastName]) LIKE N'%john%') OR (LOWER([u].[LastName]) LIKE N'%doe%'))
   ORDER BY [u].[Id] DESC
   OFFSET @__p_0 ROWS FETCH NEXT @__p_1 ROWS ONLY
   ```

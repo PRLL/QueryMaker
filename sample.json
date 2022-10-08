@@ -1,16 +1,25 @@
 {
   "filter": {
-    "fields": [ "FirstName" ],
-    "action": 1,
-    "value": [ "John", "Mary", "Doe", 23 ],
-    "ignoreCase": true
+    "fields": [ "DateOfBirth" ],
+    "value": "1990-05",
+    "action": 7,
+    "subFiltersOperation": 2,
+    "subFilters": [
+      {
+        "fields": [ "FirstName", "LastName" ],
+        "fieldsOperation": 1,
+        "value": [ "JOHN", "DoE" ],
+        "action": 1,
+        "ignoreCase": true
+      }
+    ]
   },
   "sort": {
     "field": "Id",
     "direction": 2
   },
   "select": {
-    "fields": [ "FirstName", "LastName", "DOB", "Status" ]
+    "fields": [ "Id", "FirstName", "Email", "Phone" ]
   },
   "page": {
     "skip": 2,

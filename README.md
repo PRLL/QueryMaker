@@ -36,7 +36,7 @@ Now that you have the `QueryMakerLibrary` on your project, you can make a query 
     // AND their FirstName OR LastName contains 'John' or 'Doe'
     new Filter
     {
-      Fields = new string[] { "DateOfBirth" },
+      Field = "DateOfBirth",
       Value = "1990-05",
       Action = FilterActions.GreaterThanOrEqual,
       SubFiltersOperation = FilterOperations.AndAlso,
@@ -71,7 +71,7 @@ We can also create the same QueryMaker instance as a JSON (see [sample.json](htt
   ```json
   {
     "filter": {
-      "fields": [ "DateOfBirth" ],
+      "field": "DateOfBirth",
       "value": "1990-05",
       "action": 7,
       "subFiltersOperation": 2,

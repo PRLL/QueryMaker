@@ -49,9 +49,6 @@ namespace QueryMakerLibrary.Components
 		/// </summary>
 		public bool IgnoreCase { get; set; } = true;
 
-		// public bool AutomaticConversions { get; set; } = true;
-		// public bool OnlyDirectConversions { get; set; } = false;
-
 		/// <summary>
 		/// <para>Shortcut property for passing a single field which will be set as array[1] on <see cref="QueryMakerLibrary.Components.Filter.Fields" /> property.</para>
 		/// <para>NOTE: This property is only used for set, if you want to get the value must use <see cref="QueryMakerLibrary.Components.Filter.Fields" /> property.</para>

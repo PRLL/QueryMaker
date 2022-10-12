@@ -88,7 +88,7 @@ namespace QueryMakerLibrary.Components
 		/// <summary>
 		/// <para>Array of Filter instances to join with this one; Set <see cref="QueryMakerLibrary.Components.Filter.IsJoiner" /> property to true to instead use this instance as joiner between subfilters.</para>
 		/// <para>Defaults to empty array of Filters.</para>
-		/// <para>NOTE: If this property has items and <see cref="QueryMakerLibrary.Components.Filter.SubFilters" /> property is not set to a valid value, then will throw exception</para>
+		/// <para>NOTE: If this property has items and <see cref="QueryMakerLibrary.Components.Filter.SubFiltersOperation" /> property is not set to a valid value, then will throw exception</para>
 		/// </summary>
 		public Filter[] SubFilters
 		{

@@ -86,6 +86,40 @@ namespace QueryMakerLibrary.Components
 		public FilterOperations FieldsOperation { get; set; }
 
 		/// <summary>
+		/// <para>Shortcut property to set the value of <see cref="QueryMakerLibrary.Components.Filter.SubFilters" /> property
+		/// with <see cref="QueryMakerLibrary.Components.Filter.SubFiltersOperation" /> set to <see cref="QueryMakerLibrary.Components.Filter.FilterOperations.OrElse" />.</para>
+		/// </summary>
+		public Filter[] Or
+		{
+			get => SubFilters;
+			set
+			{
+				if (value is not null)
+				{
+					SubFiltersOperation = FilterOperations.OrElse;
+					SubFilters = value;
+				}
+			}
+		}
+
+		/// <summary>
+		/// <para>Shortcut property to set the value of <see cref="QueryMakerLibrary.Components.Filter.SubFilters" /> property
+		/// with <see cref="QueryMakerLibrary.Components.Filter.SubFiltersOperation" /> set to <see cref="QueryMakerLibrary.Components.Filter.FilterOperations.AndAlso" />.</para>
+		/// </summary>
+		public Filter[] And
+		{
+			get => SubFilters;
+			set
+			{
+				if (value is not null)
+				{
+					SubFiltersOperation = FilterOperations.AndAlso;
+					SubFilters = value;
+				}
+			}
+		}
+
+		/// <summary>
 		/// <para>Array of Filter instances to join with this one; Set <see cref="QueryMakerLibrary.Components.Filter.IsJoiner" /> property to true to instead use this instance as joiner between subfilters.</para>
 		/// <para>Defaults to empty array of Filters.</para>
 		/// <para>NOTE: If this property has items and <see cref="QueryMakerLibrary.Components.Filter.SubFiltersOperation" /> property is not set to a valid value, then will throw exception</para>

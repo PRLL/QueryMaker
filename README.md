@@ -39,8 +39,7 @@ Now that you have the `QueryMakerLibrary` on your project, you can make a query 
       Field = "DateOfBirth",
       Value = "1990-05",
       Action = FilterActions.GreaterThanOrEqual,
-      SubFiltersOperation = FilterOperations.AndAlso,
-      SubFilters = new Filter[]
+      And = new Filter[]
       {
         new Filter
         {
@@ -74,8 +73,7 @@ We can also create the same QueryMaker instance as a JSON (see [sample.json](htt
       "field": "DateOfBirth",
       "value": "1990-05",
       "action": 7,
-      "subFiltersOperation": 2,
-      "subFilters": [
+      "and": [
         {
           "fields": [ "FirstName", "LastName" ],
           "fieldsOperation": 1,

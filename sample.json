@@ -3,8 +3,7 @@
     "field": "DateOfBirth",
     "value": "1990-05",
     "action": 7,
-    "subFiltersOperation": 2,
-    "subFilters": [
+    "and": [
       {
         "fields": [ "FirstName", "LastName" ],
         "fieldsOperation": 1,

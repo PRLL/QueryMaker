@@ -53,8 +53,8 @@ namespace QueryMakerLibrary.Components
 		// public bool OnlyDirectConversions { get; set; } = false;
 
 		/// <summary>
-		/// <para>Shortcut property for passing a field which will be set as single item array on <see cref="QueryMakerLibrary.Components.Filter.Fields" /> property.</para>
-		/// <para>NOTE: Do not set both this and <see cref="QueryMakerLibrary.Components.Filter.Fields" /> property.</para>
+		/// <para>Shortcut property for passing a single field which will be set as array[1] on <see cref="QueryMakerLibrary.Components.Filter.Fields" /> property.</para>
+		/// <para>NOTE: This property is only used for set, if you want to get the value must use <see cref="QueryMakerLibrary.Components.Filter.Fields" /> property.</para>
 		/// </summary>
 		public string Field
 		{

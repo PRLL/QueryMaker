@@ -1,6 +1,6 @@
 {
   "filter": {
-    "fields": [ "DateOfBirth" ],
+    "field": "DateOfBirth",
     "value": "1990-05",
     "action": 7,
     "subFiltersOperation": 2,

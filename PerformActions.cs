@@ -17,16 +17,17 @@ namespace QueryMakerLibrary
 				throw Errors.Exception(Errors.IQueryableNull);
 			}
 
-			IQueryable<T> nonPaginatedQuery = CreateSelectedQuery(
-				CreateSortedQuery(
-					CreateFilteredQuery(query,
-						queryMaker.Filter),
-					queryMaker.Sort),
-				queryMaker.Select);
+			IQueryable<T> filteredQuery = CreateFilteredQuery(query, queryMaker.Filter);
 
 			return QueryMakerResult<T>.Construct(
-				CreatePagedQuery(nonPaginatedQuery, queryMaker.Page),
-				getTotalCount ? nonPaginatedQuery.Count() : null);
+				CreateSelectedQuery(
+					CreatePagedQuery(
+						query,
+						CreateSortedQuery(filteredQuery,
+							queryMaker.Sort),
+						queryMaker.Page),
+					queryMaker.Select),
+				getTotalCount ? filteredQuery.Count() : null);
 		}
 
 		internal static IQueryable<T> CreateActionsQuery<T>(IQueryable<T> query, QueryMaker queryMaker)
@@ -37,14 +38,15 @@ namespace QueryMakerLibrary
 			}
 
 			return
-				CreatePagedQuery(
-					CreateSelectedQuery(
+				CreateSelectedQuery(
+					CreatePagedQuery(
+						query,
 						CreateSortedQuery(
 							CreateFilteredQuery(query,
 								queryMaker.Filter),
 							queryMaker.Sort),
-						queryMaker.Select),
-					queryMaker.Page);
+						queryMaker.Page),
+					queryMaker.Select);
 		}
 
 		#endregion Internal Methods
@@ -121,22 +123,37 @@ namespace QueryMakerLibrary
 			return query;
 		}
 
-		private static IQueryable<T> CreatePagedQuery<T>(IQueryable<T> query, Page? page = null)
+		private static IQueryable<T> CreatePagedQuery<T>(IQueryable<T> unfilterQuery, IQueryable<T> filteredQuery, Page? page = null)
 		{
 			if (page is not null)
 			{
 				if (page.Skip > 0)
 				{
-					query = query.Skip((int)page.Skip);
+					filteredQuery = filteredQuery.Skip((int)page.Skip);
 				}
 
 				if (page.Take > 0)
 				{
-					return query.Take((int)page.Take);
+					filteredQuery = filteredQuery.Take((int)page.Take);
+				}
+
+				if (!string.IsNullOrWhiteSpace(page.Index))
+				{
+					ParameterExpression parameterExpression = Expression.Parameter(typeof(T), Miscellaneous.INSTANCE);
+					MemberExpression memberExpression = MemberMethods.GetPropertyOrField<T>(parameterExpression, page.Index);
+
+					return unfilterQuery.Where(Expression.Lambda<Func<T, bool>>(
+						Expression.Call(
+							EnumerableMethods.GetEnumerableTypedMethod(memberExpression.Type,
+								EnumMethods.GetActionText(Filter.FilterActions.Contains)),
+							SelectMethods.CreateTypedSelectConstantExpression(filteredQuery, memberExpression.Type.Name,
+								parameterExpression, page.Index),
+							memberExpression),
+						parameterExpression));
 				}
 			}
 
-			return query;
+			return filteredQuery;
 		}
 
 		#endregion Private Methods

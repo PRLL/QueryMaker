@@ -53,14 +53,14 @@ Now that you have the `QueryMakerLibrary` on your project, you can make a query 
       }
     },
 
-    // we also want to sort them by Id on a descending direction
-    new Sort("Id", SortDirections.Descending),
-
-    // then, we want to select the following fields
-    new Select(new string[] { "Id", "FirstName", "Email", "Phone" }),
-
-    // and finally, we want to page the results by skipping 2 and taking 5
+    // then, we want to page the results by skipping 2 and taking 5
     new Page(2, 5));
+
+    // we also want to sort them by Id on a descending direction
+    new Sort("FirstName", SortDirections.Descending),
+
+    // finally, we only want to select the following fields
+    new Select(new string[] { "Id", "FirstName", "Email", "Phone" }),
 
   // we can then pass this query we created to the MakeQuery() method on an IQueryable instance
   return await _dataContext.Users.MakeQuery(query).ToListAsync();
@@ -85,16 +85,16 @@ We can also create the same QueryMaker instance as a JSON (see [sample.json](htt
         }
       ]
     },
+    "page": {
+      "skip": 1,
+      "take": 5
+    },
     "sort": {
-      "field": "Id",
+      "field": "FirstName",
       "direction": 2
     },
     "select": {
       "fields": [ "Id", "FirstName", "Email", "Phone" ]
-    },
-    "page": {
-      "skip": 2,
-      "take": 5
     }
   }
   ```
@@ -102,10 +102,10 @@ We can also create the same QueryMaker instance as a JSON (see [sample.json](htt
 And then receive this JSON on an API endpoint and make the query dynamically:
 
   ```csharp
-  [HttpPost("filterUsers")]
+  [HttpPost(Name = "filterUsers")]
   public async Task<IActionResult> FilterUsers([FromBody] QueryMaker query)
   {
-    return await _dataContext.Users.MakeQuery(query).ToListAsync();
+    return await Ok(_dataContext.Users.MakeQuery(query).ToListAsync());
   }
   ```
 
@@ -116,7 +116,7 @@ In both cases, Entity Framework will generate the following SQL query:
   FROM [Users] AS [u]
   WHERE ([u].[DateOfBirth] >= '1990-05-01T00:00:00.0000000')
     AND ((LOWER([u].[LastName]) LIKE N'%john%') OR (LOWER([u].[LastName]) LIKE N'%doe%'))
-  ORDER BY [u].[Id] DESC
+  ORDER BY [u].[FirstName] DESC
   OFFSET @__p_0 ROWS FETCH NEXT @__p_1 ROWS ONLY
   ```
 
@@ -132,10 +132,10 @@ In both cases, Entity Framework will generate the following SQL query:
 - [x] Add use of arrays for fields and values to perform multiple operations on a single filter
 - [x] Add extension to IQueryable interface for direct use on instances
 - [x] Add a method which returns the resulting query and the total count of items without pagination
+- [x] Add functionality for performing pagination using an index
 - [ ] Create documentation/tutorial for using the library
 - [ ] Add support for IEnumerable and it's inherited interfaces (IList, ICollection...)
 - [ ] Add static configuration class for setting defaults (i.e. IgnoreCase = true/false by default...)
-- [ ] Add functionality for performing pagination using an index
 
 <br />
 

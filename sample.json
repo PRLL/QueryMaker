@@ -14,15 +14,15 @@
       }
     ]
   },
+  "page": {
+    "skip": 1,
+    "take": 5
+  },
   "sort": {
-    "field": "Id",
+    "field": "FirstName",
     "direction": 2
   },
   "select": {
     "fields": [ "Id", "FirstName", "Email", "Phone" ]
-  },
-  "page": {
-    "skip": 2,
-    "take": 5
   }
 }

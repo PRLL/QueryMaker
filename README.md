@@ -105,7 +105,7 @@ And then receive this JSON on an API endpoint and make the query dynamically:
   [HttpPost(Name = "filterUsers")]
   public async Task<IActionResult> FilterUsers([FromBody] QueryMaker query)
   {
-    return await Ok(_dataContext.Users.MakeQuery(query).ToListAsync());
+    return Ok(await _dataContext.Users.MakeQuery(query).ToListAsync());
   }
   ```
 

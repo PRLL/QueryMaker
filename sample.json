@@ -19,7 +19,10 @@
   },
   "sort": {
     "field": "FirstName",
-    "direction": 2
+    "then": {
+      "field": "DateOfDeath",
+      "direction": 2
+    }
   },
   "select": {
     "fields": [ "Id", "FirstName", "Email", "Phone" ]

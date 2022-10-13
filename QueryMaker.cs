@@ -36,12 +36,12 @@ namespace QueryMakerLibrary
 		/// <para>Defaults to null.</para>
 		/// NOTE: If left as null paging action will not be performed
 		/// </param>
-		public QueryMaker(Filter? filter = null, Sort? sort = null, Select? select = null, Page? page = null)
+		public QueryMaker(Filter? filter = null, Page? page = null, Sort? sort = null, Select? select = null)
 		{
 			Filter = filter;
+			Page = page;
 			Sort = sort;
 			Select = select;
-			Page = page;
 		}
 
 		#endregion Constructors

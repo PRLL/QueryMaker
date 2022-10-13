@@ -21,10 +21,15 @@ namespace QueryMakerLibrary.Components
 		/// <para>Defaults to <see cref="QueryMakerLibrary.Components.Sort.SortDirections.Ascending" />.</para>
 		/// <para>NOTE: If not a valid direction, then will throw exception.</para>
 		/// </param>
-		public Sort(string field, SortDirections direction = SortDirections.Ascending)
+		/// <param name="then">
+		/// <para>Sorting performed after this one.</para>
+		/// <para>Defaults to null.</para>
+		/// </param>
+		public Sort(string field, SortDirections direction = SortDirections.Ascending, Sort? then = null)
 		{
 			Field = field;
 			Direction = direction;
+			Then = then;
 		}
 
 		#endregion Constructors
@@ -45,6 +50,12 @@ namespace QueryMakerLibrary.Components
 		/// <para>NOTE: If not a valid direction, then will throw exception.</para>
 		/// </summary>
 		public SortDirections Direction { get; set; } = SortDirections.Ascending;
+
+		/// <summary>
+		/// <para>Sorting performed after this one.</para>
+		/// <para>Defaults to null.</para>
+		/// </summary>
+		public Sort? Then { get; set; } = null;
 
 		#endregion Public Properties
 

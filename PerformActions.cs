@@ -68,7 +68,8 @@ namespace QueryMakerLibrary
 			return query;
 		}
 
-		private static IQueryable<T> CreateSortedQuery<T>(IQueryable<T> query, Sort? sort = null)
+		private static IQueryable<T> CreateSortedQuery<T>(IQueryable<T> query, Sort? sort = null,
+			bool isThen = false, IOrderedQueryable<T>? orderedQuery = null)
 		{
 			if (sort is not null)
 			{
@@ -77,21 +78,34 @@ namespace QueryMakerLibrary
 					throw Errors.Exception(Errors.SortFieldEmpty);
 				}
 
+				Expression<Func<T, object>> selectExpression = SelectMethods.CreateSelectExpression<T>(
+						Expression.Parameter(typeof(T), Miscellaneous.INSTANCE),
+						sort.Field);
+
 				switch(sort.Direction)
 				{
 					case SortDirections.Ascending:
-						return query.OrderBy(SelectMethods.CreateSelectExpression<T>(
-							Expression.Parameter(typeof(T), Miscellaneous.INSTANCE),
-							sort.Field))
-						.AsQueryable<T>();
+						orderedQuery = isThen && orderedQuery is not null
+								? orderedQuery.ThenBy(selectExpression)
+								: query.OrderBy(selectExpression);
+						break;
+
 					case SortDirections.Descending:
-						return query.OrderByDescending(SelectMethods.CreateSelectExpression<T>(
-							Expression.Parameter(typeof(T), Miscellaneous.INSTANCE),
-							sort.Field))
-						.AsQueryable<T>();
+						orderedQuery = isThen && orderedQuery is not null
+								? orderedQuery.ThenByDescending(selectExpression)
+								: query.OrderByDescending(selectExpression);
+						break;
+
 					default:
-						throw Errors.Exception(Errors.InvalidSortingDirection, sort.Direction);
+						throw Errors.Exception(Errors.InvalidSortingDirection, sort.Direction, true);
 				}
+
+				if (sort.Then is not null)
+				{
+					return CreateSortedQuery<T>(query, sort.Then, true, orderedQuery);
+				}
+
+				return orderedQuery;
 			}
 
 			return query;

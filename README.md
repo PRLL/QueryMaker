@@ -53,13 +53,14 @@ Now that you have the `QueryMakerLibrary` on your project, you can make a query 
     },
 
     // then, we want to page the results by skipping 2 and taking 5
-    new Page(2, 5));
+    new Page(2, 5),
 
-    // we also want to sort them by Id on a descending direction
-    new Sort("FirstName", SortDirections.Descending),
+    // we also want to sort them by FirstName on ascending direction
+    // and then sort by DateOfDeath on a descending direction
+    new Sort("FirstName", then: new Sort("DateOfDeath", SortDirections.Descending)),
 
-    // finally, we only want to select the following fields
-    new Select(new string[] { "Id", "FirstName", "Email", "Phone" }),
+    // finally, we want to explicitly select the following fields
+    new Select(new string[] { "Id", "FirstName", "Email", "Phone" }));
 
   // we can then pass this query we created to the MakeQuery() method on an IQueryable instance
   return await _dataContext.Users.MakeQuery(query).ToListAsync();
@@ -89,7 +90,10 @@ We can also create the same QueryMaker instance as a JSON (see [sample.json](htt
     },
     "sort": {
       "field": "FirstName",
-      "direction": 2
+      "then": {
+        "field": "DateOfDeath",
+        "direction": 2
+      }
     },
     "select": {
       "fields": [ "Id", "FirstName", "Email", "Phone" ]
@@ -114,7 +118,7 @@ In both cases, Entity Framework will generate the following SQL query:
   FROM [Users] AS [u]
   WHERE ([u].[DateOfBirth] >= '1990-05-01T00:00:00.0000000')
     AND ((LOWER([u].[LastName]) LIKE N'%john%') OR (LOWER([u].[LastName]) LIKE N'%doe%'))
-  ORDER BY [u].[FirstName] DESC
+  ORDER BY [u].[FirstName], [u].[DateOfDeath] DESC
   OFFSET @__p_0 ROWS FETCH NEXT @__p_1 ROWS ONLY
   ```
 

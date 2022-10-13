@@ -25,11 +25,11 @@ namespace QueryMakerLibrary.Components
 		/// <para>Defaults to 0.</para>
 		/// <para>NOTE: If left as 0 then will not perform take action.</para>
 		/// </param>
-		public Page(string index = "", uint skip = 0, uint take = 0)
+		public Page(uint skip = 0, uint take = 0, string index = "")
 		{
-			Index = index;
 			Skip = skip;
 			Take = take;
+			Index = index;
 		}
 
 		#endregion Constructors

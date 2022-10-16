@@ -28,6 +28,7 @@ namespace QueryMakerLibrary.Logic
 						"ToString",
 						Type.EmptyTypes)
 					: actionExpression.MemberExpression;
+
 			Expression typedValueExpression = Expression.Constant((!itemSameTypeAsMember && (value is not null
 				&& !value.GetType().Equals(typeof(string)))) || (isContentAction
 				&& value is not null && !value.GetType().Equals(typeof(string)))
@@ -50,6 +51,11 @@ namespace QueryMakerLibrary.Logic
 						"ToLower",
 						Type.EmptyTypes);
 				}
+			}
+
+			if (isContentAction && value is null)
+			{
+				typedValueExpression = Expression.Constant("null");
 			}
 
 			Expression? evaluationExpression = null;

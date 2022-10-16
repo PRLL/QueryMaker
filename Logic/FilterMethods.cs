@@ -87,7 +87,7 @@ namespace QueryMakerLibrary.Logic
 					MemberMethods.GetPropertyOrField<T>(parameterExpression, field),
 					filter.Value));
 
-				newExpression = !EnumMethods.IsValidOperation(filter.FieldsOperation)
+				newExpression = newExpression is not null
 					? WhereExpressionOperationHandler(newExpression, createdExpression, filter.FieldsOperation)
 					: createdExpression;
 			}

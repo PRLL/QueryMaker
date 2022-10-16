@@ -18,7 +18,7 @@ namespace QueryMakerLibrary.Logic
 				{
 					actualValue = TypeConversions.ConvertJsonElementToValidType(propertyType, (JsonElement)value);
 				}
-				else if (value is not null)
+				else
 				{
 					actualValue = TypeConversions.ConvertValueToPropertyType(propertyType, value);
 				}

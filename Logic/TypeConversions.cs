@@ -9,39 +9,49 @@ namespace QueryMakerLibrary.Logic
 	{
 		#region Object Conversions
 
-		internal static object ConvertValueToPropertyType(Type propertyType, object value)
+		internal static object? ConvertValueToPropertyType(Type propertyType, object? value)
 		{
-			TypeConverter converter = TypeDescriptor.GetConverter(propertyType);
-			if (MemberMethods.IsEnumerableType(value.GetType()))
+			if (value is null)
 			{
-				// try converting all item to same propertyType and store on 'objectsList'
-				List<object?> objectsList = new List<object?>();
-				foreach (object? item in (value as IList) ?? throw Errors.Exception(Errors.ExpressionValueToList))
-				{
-					objectsList.Add(ConvertObjectToType(converter, item));
-				}
-
-				// return list of different objects
-				return objectsList;
+				return value;
 			}
 			else
 			{
-				return ConvertObjectToType(converter, value);
+				TypeConverter converter = TypeDescriptor.GetConverter(propertyType);
+				if (MemberMethods.IsEnumerableType(value.GetType()))
+				{
+					// try converting all item to same propertyType and store on 'objectsList'
+					List<object?> objectsList = new List<object?>();
+					foreach (object? item in (value as IList) ?? throw Errors.Exception(Errors.ExpressionValueToList))
+					{
+						objectsList.Add(ConvertObjectToType(converter, item));
+					}
+
+					// return list of different objects
+					return objectsList;
+				}
+				else
+				{
+					return ConvertObjectToType(converter, value);
+				}
 			}
 		}
 
-		private static object ConvertObjectToType(TypeConverter converter, object value)
+		private static object? ConvertObjectToType(TypeConverter converter, object? value)
 		{
-			try
+			if (value is not null)
 			{
-				if (converter.CanConvertFrom(value.GetType()))
+				try
 				{
-					value = converter.ConvertFrom(value) ?? string.Empty;
+					if (converter.CanConvertFrom(value.GetType()))
+					{
+						value = converter.ConvertFrom(value);
+					}
 				}
-			}
-			catch (Exception)
-			{
-				value = (value ?? string.Empty).ToString() ?? string.Empty;
+				catch (Exception)
+				{
+					//
+				}
 			}
 
 			return value;

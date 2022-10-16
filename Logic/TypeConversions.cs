@@ -68,7 +68,7 @@ namespace QueryMakerLibrary.Logic
 
 					List<object?> objectsList = new List<object?>();
 					jsonElement.EnumerateArray().ToList()
-						.ForEach(o => objectsList.Add(ConvertJsonElementValueToValidType(propertyType, o)));
+						.ForEach(o => objectsList.Add(ConvertJsonElementToValidType(propertyType, o)));
 
 					// return list of different objects
 					return objectsList;

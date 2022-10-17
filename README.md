@@ -39,17 +39,13 @@ Now that you have the `QueryMakerLibrary` on your project, you can make a query 
       Field = "DateOfBirth",
       Value = "1990-05",
       Action = FilterActions.GreaterThanOrEqual,
-      And = new Filter[]
-      {
-        new Filter
+      And = new Filter
         {
           Fields = new string[] { "FirstName", "LastName" },
-          FieldsOperation = FilterOperations.OrElse,
           Value = new object?[] { "JOHN", "DoE" },
           Action = FilterActions.Contains,
           IgnoreCase = true
         }
-      }
     },
 
     // then, we want to page the results by skipping 2 and taking 5
@@ -74,15 +70,13 @@ We can also create the same QueryMaker instance as a JSON (see [sample.json](htt
       "field": "DateOfBirth",
       "value": "1990-05",
       "action": 7,
-      "and": [
+      "and":
         {
           "fields": [ "FirstName", "LastName" ],
-          "fieldsOperation": 1,
           "value": [ "JOHN", "DoE" ],
           "action": 1,
           "ignoreCase": true
         }
-      ]
     },
     "page": {
       "skip": 1,
@@ -116,8 +110,9 @@ In both cases, Entity Framework will generate the following SQL query:
   ```sql
   SELECT [u].[Id], [u].[FirstName], [u].[Email], [u].[Phone]
   FROM [Users] AS [u]
-  WHERE ([u].[DateOfBirth] >= '1990-05-01T00:00:00.0000000')
-    AND ((LOWER([u].[LastName]) LIKE N'%john%') OR (LOWER([u].[LastName]) LIKE N'%doe%'))
+  WHERE ([u].[DateOfBirth] >= '1990-05-01T00:00:00.0000000') AND
+    (((LOWER([u].[FirstName]) LIKE N'%john%') OR (LOWER([u].[FirstName]) LIKE N'%doe%'))
+    OR ((LOWER([u].[LastName]) LIKE N'%john%') OR (LOWER([u].[LastName]) LIKE N'%doe%')))
   ORDER BY [u].[FirstName], [u].[DateOfDeath] DESC
   OFFSET @__p_0 ROWS FETCH NEXT @__p_1 ROWS ONLY
   ```

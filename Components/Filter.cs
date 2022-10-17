@@ -51,7 +51,7 @@ namespace QueryMakerLibrary.Components
 
 		/// <summary>
 		/// <para>Shortcut property for passing a single field which will be set as array[1] on <see cref="QueryMakerLibrary.Components.Filter.Fields" /> property.</para>
-		/// <para>NOTE: This property is only used for set, if you want to get the value must use <see cref="QueryMakerLibrary.Components.Filter.Fields" /> property.</para>
+		/// <para>NOTE: This property is only used for set, if you want to get the value use <see cref="QueryMakerLibrary.Components.Filter.Fields" /> property.</para>
 		/// </summary>
 		public string Field
 		{
@@ -78,18 +78,35 @@ namespace QueryMakerLibrary.Components
 		}
 
 		/// <summary>
-		/// <para>Operation to perform between each field action when set more than one on <see cref="QueryMakerLibrary.Components.Filter.Fields" /> property.</para>
+		/// <para>Operation to perform between multiple fields when passed more than one on <see cref="QueryMakerLibrary.Components.Filter.Fields" /> property.</para>
 		/// <para>Refer to <see cref="QueryMakerLibrary.Components.Filter.FilterOperations" /> for possible values</para>
-		/// <para>Defaults to 0.</para>
+		/// <para>Defaults to <see cref="QueryMakerLibrary.Components.Filter.FilterOperations.OrElse" />.</para>
 		/// <para>NOTE: If not set to a valid <see cref="QueryMakerLibrary.Components.Filter.FilterOperations" /> value and <see cref="QueryMakerLibrary.Components.Filter.Fields" /> property contains more than one field, then will throw exception when performing Filtering action.</para>
 		/// </summary>
-		public FilterOperations FieldsOperation { get; set; }
+		public FilterOperations FieldsOperation { get; set; } = FilterOperations.OrElse;
+
+		/// <summary>
+		/// <para>Shortcut property to set the value of <see cref="QueryMakerLibrary.Components.Filter.SubFilters" /> property as a single filter
+		/// with <see cref="QueryMakerLibrary.Components.Filter.SubFiltersOperation" /> set to <see cref="QueryMakerLibrary.Components.Filter.FilterOperations.OrElse" />.</para>
+		/// <para>NOTE: This property is only used for set, if you want to get the value use <see cref="QueryMakerLibrary.Components.Filter.SubFilters" /> property.</para>
+		/// </summary>
+		public Filter Or
+		{
+			set
+			{
+				if (value is not null)
+				{
+					SubFiltersOperation = FilterOperations.OrElse;
+					SubFilters = new Filter[1] { value };
+				}
+			}
+		}
 
 		/// <summary>
 		/// <para>Shortcut property to set the value of <see cref="QueryMakerLibrary.Components.Filter.SubFilters" /> property
 		/// with <see cref="QueryMakerLibrary.Components.Filter.SubFiltersOperation" /> set to <see cref="QueryMakerLibrary.Components.Filter.FilterOperations.OrElse" />.</para>
 		/// </summary>
-		public Filter[] Or
+		public Filter[] Ors
 		{
 			get => SubFilters;
 			set
@@ -103,10 +120,27 @@ namespace QueryMakerLibrary.Components
 		}
 
 		/// <summary>
+		/// <para>Shortcut property to set the value of <see cref="QueryMakerLibrary.Components.Filter.SubFilters" /> property as a single filter
+		/// with <see cref="QueryMakerLibrary.Components.Filter.SubFiltersOperation" /> set to <see cref="QueryMakerLibrary.Components.Filter.FilterOperations.AndAlso" />.</para>
+		/// <para>NOTE: This property is only used for set, if you want to get the value use <see cref="QueryMakerLibrary.Components.Filter.SubFilters" /> property.</para>
+		/// </summary>
+		public Filter And
+		{
+			set
+			{
+				if (value is not null)
+				{
+					SubFiltersOperation = FilterOperations.AndAlso;
+					SubFilters = new Filter[1] { value };
+				}
+			}
+		}
+
+		/// <summary>
 		/// <para>Shortcut property to set the value of <see cref="QueryMakerLibrary.Components.Filter.SubFilters" /> property
 		/// with <see cref="QueryMakerLibrary.Components.Filter.SubFiltersOperation" /> set to <see cref="QueryMakerLibrary.Components.Filter.FilterOperations.AndAlso" />.</para>
 		/// </summary>
-		public Filter[] And
+		public Filter[] Ands
 		{
 			get => SubFilters;
 			set

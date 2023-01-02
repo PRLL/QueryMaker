@@ -345,7 +345,7 @@ namespace QueryMakerLibrary.Logic
 							(ParameterExpression)anyActionExpression.MemberExpression));
 
 				default:
-					throw new ArgumentOutOfRangeException(nameof(PrimtiveTypes), membertTypeName, null);//Errors.Exception(Errors.InvalidTypeConversion);
+					throw new ArgumentOutOfRangeException(nameof(PrimtiveTypes), membertTypeName, null);
 			}
 		}
 	}

@@ -76,10 +76,6 @@ namespace QueryMakerLibrary
 		/// </summary>
 		public Page? Page { get; set; } = null;
 
-		// useful when return filter result object
-		// public bool ContinueWithErrors { get; set; } = false;
-		// public List<string> ErrorsList { get; set; } = new List<string>();
-
 		#endregion Public Properties
 
 		#region Public Instance Methods
@@ -200,6 +196,30 @@ namespace QueryMakerLibrary
 		{
 			return PerformActions.CreateActionsQuery(query,
 				new QueryMaker(page: this.Page));
+		}
+
+		public QueryMaker WithFilter(Filter filter)
+		{
+			Filter = filter;
+			return this;
+		}
+
+		public QueryMaker WithSort(Sort sort)
+		{
+			Sort = sort;
+			return this;
+		}
+
+		public QueryMaker WithSelect(Select select)
+		{
+			Select = select;
+			return this;
+		}
+
+		public QueryMaker WithPage(Page page)
+		{
+			Page = page;
+			return this;
 		}
 
 		#endregion Public Instance Methods

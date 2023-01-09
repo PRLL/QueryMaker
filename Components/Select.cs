@@ -10,6 +10,26 @@ namespace QueryMakerLibrary.Components
 		#region Constructors
 
 		/// <summary>
+		/// Initializes a new instance of <see cref="QueryMakerLibrary.Components.Select" /> class with all properties set to their defaults.
+		/// </summary>
+		public Select()
+		{
+			//
+		}
+
+		/// <summary>
+		/// Initializes a new instance of <see cref="QueryMakerLibrary.Components.Select" /> class.
+		/// <para>Note: If left <paramref name="fields" /> empty then will return query as is.</para>
+		/// </summary>
+		/// <param name="fields">
+		/// <para>Fields to select.</para>
+		/// </param>
+		public Select(params string[] fields)
+		{
+			Fields = fields;
+		}
+
+		/// <summary>
 		/// Initializes a new instance of the <see cref="QueryMakerLibrary.Components.Select" /> class.
 		/// <para>Note: If both properties are empty then will return query as is.</para>
 		/// </summary>

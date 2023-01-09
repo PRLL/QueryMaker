@@ -31,34 +31,21 @@ Now that you have the `QueryMakerLibrary` on your project, you can make a query 
   ```csharp
   // first, we create an instance of QueryMaker with the components we want to use
   // they are all optional, but for this sample we will use them all
-  QueryMaker query = new QueryMaker (
+  QueryMaker query = new QueryMaker()
     // say we want to filter the users which their DateOfBirth is Greater Than Or Equal to May 1990
-    // AND their FirstName OR LastName contains 'John' or 'Doe'
-    new Filter
-    {
-      Field = "DateOfBirth",
-      Value = "1990-05",
-      Action = FilterActions.GreaterThanOrEqual,
-      And = new Filter
-        {
-          Fields = new string[] { "FirstName", "LastName" },
-          Value = new object?[] { "JOHN", "DoE" },
-          Action = FilterActions.Contains,
-          IgnoreCase = true
-        }
-    },
-
-    // then, we want to page the results by skipping 2 and taking 5
-    new Page(2, 5),
-
-    // we also want to sort them by FirstName on ascending direction
-    // and then sort by DateOfDeath on a descending direction
-    new Sort("FirstName", then: new Sort("DateOfDeath", SortDirections.Descending)),
-
+    .WithFilter(new Filter("DateOfBirth", FilterActions.GreaterThanOrEqual, "1990-05")
+      // and also their FirstName or LastName contains 'John' or 'Doe' ignoring case sensitivity
+      .AndAlso(new Filter(new string[] { "FirstName", "LastName" }, FilterActions.Contains, new object?[] { "joHN", "DoE" })))
+    // then, we want to paginate the results by skipping 2 and taking 5
+    .WithPage(new Page(2, 5))
+    // we also want to sort them by FirstName on an ascending direction
+    .WithSort(new Sort("FirstName")
+      // and then sort by DateOfDeath on a descending direction
+      .AndThen(new Sort("DateOfDeath", SortDirections.Descending)))
     // finally, we want to explicitly select the following fields
-    new Select(new string[] { "Id", "FirstName", "Email", "Phone" }));
+    .WithSelect(new Select("Id", "FirstName", "Email", "Phone"));
 
-  // we can then pass this query we created to the MakeQuery() method on an IQueryable instance
+  // second, we pass this query we created to the MakeQuery() method on an IQueryable instance
   return await _dataContext.Users.MakeQuery(query).ToListAsync();
   ```
 
@@ -70,16 +57,15 @@ We can also create the same QueryMaker instance as a JSON (see [sample.json](htt
       "field": "DateOfBirth",
       "value": "1990-05",
       "action": 7,
-      "and":
-        {
-          "fields": [ "FirstName", "LastName" ],
-          "value": [ "JOHN", "DoE" ],
-          "action": 1,
-          "ignoreCase": true
-        }
+      "and": {
+        "fields": [ "FirstName", "LastName" ],
+        "value": [ "JOHN", "DoE" ],
+        "action": 1,
+        "ignoreCase": true
+      }
     },
     "page": {
-      "skip": 1,
+      "skip": 2,
       "take": 5
     },
     "sort": {
@@ -130,6 +116,7 @@ In both cases, Entity Framework will generate the following SQL query:
 - [x] Add extension to IQueryable interface for direct use on instances
 - [x] Add a method which returns the resulting query and the total count of items without pagination
 - [x] Add functionality for performing pagination using an index
+- [x] Create methods for adding components on a QueryMaker instance
 - [ ] Create documentation/tutorial for using the library
 - [ ] Add support for IEnumerable and it's inherited interfaces (IList, ICollection...)
 - [ ] Add static configuration class for setting defaults (i.e. IgnoreCase = true/false by default...)
@@ -148,7 +135,7 @@ Distributed under the GNU General Public License v3.0 License. See `LICENSE.txt`
 
 ## Contact
 
-LinkedIn: [Jose Toyos](https://www.linkedin.com/in/jose-moises-toyos-vargas-868119182/)
+LinkedIn: [Jose Toyos](https://www.linkedin.com/in/josetoyosvargas/)
 
 Email: josemoises.toyosvargas@hotmail.com
 

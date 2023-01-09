@@ -11,7 +11,7 @@ namespace QueryMakerLibrary.Components
 		/// Initializes a new instance of the <see cref="QueryMakerLibrary.Components.Page" /> class with an index.
 		/// </summary>
 		/// <param name="index">
-		/// <para>Field used as index for quicker pagination.</para>
+		/// <para>Field used as index for faster pagination.</para>
 		/// <para>Defaults to empty string.</para>
 		/// <para>NOTE: If left empty, then pagination will be performed without an index.</para>
 		/// </param>
@@ -37,7 +37,7 @@ namespace QueryMakerLibrary.Components
 		#region Public Properties
 
 		/// <summary>
-		/// <para>Field used as index for quicker pagination.</para>
+		/// <para>Field used as index for faster pagination.</para>
 		/// <para>Defaults to empty string.</para>
 		/// <para>NOTE: If left empty, then pagination will be performed without an index.</para>
 		/// </summary>

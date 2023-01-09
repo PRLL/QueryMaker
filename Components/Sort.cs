@@ -59,6 +59,19 @@ namespace QueryMakerLibrary.Components
 
 		#endregion Public Properties
 
+		#region Methods
+
+		/// <summary>
+		/// <para>Add sorting to be performed after this one</para>
+		/// </summary>
+		public Sort AndThen(Sort sort)
+		{
+			Then = sort;
+			return this;
+		}
+
+		#endregion Methods
+
 		#region Enums
 
 		/// <summary>

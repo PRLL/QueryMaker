@@ -1,28 +1,27 @@
 {
-	"filter": {
-	  "field": "DateOfBirth",
-	  "value": "1990-05",
-	  "action": 7,
-	  "and":
-		{
-		  "fields": [ "FirstName", "LastName" ],
-		  "value": [ "JOHN", "DoE" ],
-		  "action": 1,
-		  "ignoreCase": true
-		}
-	},
-	"page": {
-	  "skip": 1,
-	  "take": 5
-	},
-	"sort": {
-	  "field": "FirstName",
-	  "then": {
-		"field": "DateOfDeath",
-		"direction": 2
-	  }
-	},
-	"select": {
-	  "fields": [ "Id", "FirstName", "Email", "Phone" ]
-	}
+  "filter": {
+    "field": "DateOfBirth",
+    "value": "1990-05",
+    "action": 7,
+    "and": {
+      "fields": [ "FirstName", "LastName" ],
+      "value": [ "JOHN", "DoE" ],
+      "action": 1,
+      "ignoreCase": true
+    }
+  },
+  "page": {
+    "skip": 2,
+    "take": 5
+  },
+  "sort": {
+    "field": "FirstName",
+    "then": {
+    "field": "DateOfDeath",
+    "direction": 2
+    }
+  },
+  "select": {
+    "fields": [ "Id", "FirstName", "Email", "Phone" ]
   }
+}

@@ -198,24 +198,48 @@ namespace QueryMakerLibrary
 				new QueryMaker(page: this.Page));
 		}
 
+		/// <summary>
+		/// Add <see cref="QueryMakerLibrary.QueryMaker.Filter" /> component to this instance
+		/// </summary>
+		/// <param name="filter">
+		/// <para>Instance of <see cref="QueryMakerLibrary.Components.Filter" /> to add.</para>
+		/// </param>
 		public QueryMaker WithFilter(Filter filter)
 		{
 			Filter = filter;
 			return this;
 		}
 
+		/// <summary>
+		/// Add <see cref="QueryMakerLibrary.QueryMaker.Sort" /> component to this instance
+		/// </summary>
+		/// <param name="sort">
+		/// <para>Instance of <see cref="QueryMakerLibrary.Components.Sort" /> to add.</para>
+		/// </param>
 		public QueryMaker WithSort(Sort sort)
 		{
 			Sort = sort;
 			return this;
 		}
 
+		/// <summary>
+		/// Add <see cref="QueryMakerLibrary.QueryMaker.Select" /> component to this instance
+		/// </summary>
+		/// <param name="select">
+		/// <para>Instance of <see cref="QueryMakerLibrary.Components.Select" /> to add.</para>
+		/// </param>
 		public QueryMaker WithSelect(Select select)
 		{
 			Select = select;
 			return this;
 		}
 
+		/// <summary>
+		/// Add <see cref="QueryMakerLibrary.QueryMaker.Page" /> component to this instance
+		/// </summary>
+		/// <param name="page">
+		/// <para>Instance of <see cref="QueryMakerLibrary.Components.Page" /> to add.</para>
+		/// </param>
 		public QueryMaker WithPage(Page page)
 		{
 			Page = page;

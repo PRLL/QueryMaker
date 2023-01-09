@@ -140,3 +140,7 @@ LinkedIn: [Jose Toyos](https://www.linkedin.com/in/josetoyosvargas/)
 Email: josemoises.toyosvargas@hotmail.com
 
 Project Link: [https://github.com/PRLL/QueryMaker](https://github.com/PRLL/QueryMaker)
+
+## Copyright
+
+©Jose Toyos 2023

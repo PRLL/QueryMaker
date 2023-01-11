@@ -377,7 +377,7 @@ namespace QueryMakerLibrary
 		/// <para>Defaults to false.</para>
 		/// </param>
 		/// <returns>
-		/// This instance of <see cref="QueryMaker" /> with added <paramref name="subFilters" /> on <see cref="Filter" /> component.
+		/// This instance of <see cref="QueryMaker" /> with added <see cref="Filter.SubFilters" /> on <see cref="Filter" /> component.
 		/// </returns>
 		public QueryMaker AndAlsoFilterBy(string field, FilterActions action, object? value,
 			bool ignoreCase = true, bool negate = false)
@@ -415,7 +415,7 @@ namespace QueryMakerLibrary
 		/// <para>Defaults to false.</para>
 		/// </param>
 		/// <returns>
-		/// This instance of <see cref="QueryMaker" /> with added <paramref name="subFilters" /> on <see cref="Filter" /> component.
+		/// This instance of <see cref="QueryMaker" /> with added <see cref="Filter.SubFilters" /> on <see cref="Filter" /> component.
 		/// </returns>
 		public QueryMaker AndAlsoFilterBy(string[] fields, FilterActions action, object? value,
 			FilterOperations fieldsOperation = FilterOperations.OrElse, bool ignoreCase = true, bool negate = false)
@@ -466,7 +466,7 @@ namespace QueryMakerLibrary
 		/// <para>Defaults to false.</para>
 		/// </param>
 		/// <returns>
-		/// This instance of <see cref="QueryMaker" /> with added <paramref name="subFilters" /> on <see cref="Filter" /> component.
+		/// This instance of <see cref="QueryMaker" /> with added <see cref="Filter.SubFilters" /> on <see cref="Filter" /> component.
 		/// </returns>
 		public QueryMaker OrElseFilterBy(string field, FilterActions action, object? value,
 			bool ignoreCase = true, bool negate = false)
@@ -504,7 +504,7 @@ namespace QueryMakerLibrary
 		/// <para>Defaults to false.</para>
 		/// </param>
 		/// <returns>
-		/// This instance of <see cref="QueryMaker" /> with added <paramref name="subFilters" /> on <see cref="Filter" /> component.
+		/// This instance of <see cref="QueryMaker" /> with added <see cref="Filter.SubFilters" /> on <see cref="Filter" /> component.
 		/// </returns>
 		public QueryMaker OrElseFilterBy(string[] fields, FilterActions action, object? value,
 			FilterOperations fieldsOperation = FilterOperations.OrElse, bool ignoreCase = true, bool negate = false)
@@ -595,7 +595,7 @@ namespace QueryMakerLibrary
 		/// <para>Defaults to null.</para>
 		/// </param>
 		/// <returns>
-		/// This instance of <see cref="QueryMaker" /> with added <paramref name="sort" /> on <see cref="Sort.Then" /> property of <see cref="Sort" /> component.
+		/// This instance of <see cref="QueryMaker" /> with added on <see cref="Sort.Then" /> property of <see cref="Sort" /> component.
 		/// </returns>
 		public QueryMaker AndThenSortBy(string field, SortDirections direction = SortDirections.Ascending, Sort? then = null)
 		{
@@ -618,7 +618,7 @@ namespace QueryMakerLibrary
 		/// <para>Instance of <see cref="QueryMakerLibrary.Components.Page" /> to add.</para>
 		/// </param>
 		/// <returns>
-		/// This instance of <see cref="QueryMaker" /> with added <paramref name="Page" /> component.
+		/// This instance of <see cref="QueryMaker" /> with added <see cref="Page" /> component.
 		/// </returns>
 		public QueryMaker WithPage(Page page)
 		{
@@ -645,7 +645,7 @@ namespace QueryMakerLibrary
 		/// <para>NOTE: If left empty, then regular pagination will be performed without using an index.</para>
 		/// </param>
 		/// <returns>
-		/// This instance of <see cref="QueryMaker" /> with added <paramref name="Page" /> component.
+		/// This instance of <see cref="QueryMaker" /> with added <see cref="Page" /> component.
 		/// </returns>
 		public QueryMaker WithPage(uint skip = 0, uint take = 0, string index = "")
 		{
@@ -671,7 +671,7 @@ namespace QueryMakerLibrary
 		/// <para>Fields to select.</para>
 		/// </param>
 		/// <returns>
-		/// This instance of <see cref="QueryMaker" /> with added <paramref name="Select" /> component.
+		/// This instance of <see cref="QueryMaker" /> with added <see cref="Select" /> component.
 		/// </returns>
 		public QueryMaker WithSelect(params string[] fields)
 		{
@@ -693,7 +693,7 @@ namespace QueryMakerLibrary
 		/// <para>NOTE: If left empty distinction will not be performed.</para>
 		/// </param>
 		/// <returns>
-		/// This instance of <see cref="QueryMaker" /> with added <paramref name="Select" /> component.
+		/// This instance of <see cref="QueryMaker" /> with added <see cref="Select" /> component.
 		/// </returns>
 		public QueryMaker WithSelect(string[]? fields = null, string[]? distinctBy = null)
 		{

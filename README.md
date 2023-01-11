@@ -33,17 +33,20 @@ Now that you have the `QueryMakerLibrary` on your project, you can make a query 
   // they are all optional, but for this sample we will use them all
   QueryMaker query = new QueryMaker()
     // say we want to filter the users which their DateOfBirth is Greater Than Or Equal to May 1990
-    .WithFilter(new Filter("DateOfBirth", FilterActions.GreaterThanOrEqual, "1990-05")
-      // and also their FirstName or LastName contains 'John' or 'Doe' ignoring case sensitivity
-      .AndAlso(new Filter(new string[] { "FirstName", "LastName" }, FilterActions.Contains, new object?[] { "joHN", "DoE" })))
-    // then, we want to paginate the results by skipping 2 and taking 5
-    .WithPage(new Page(2, 5))
+    .FilterBy("DateOfBirth", FilterActions.GreaterThanOrEqual, "1990-05")
+    // and also their FirstName or LastName contains 'John' or 'Doe' ignoring case sensitivity
+    .AndAlsoFilterBy(new string[] { "FirstName", "LastName" }, FilterActions.Contains, new object?[] { "joHN", "DoE" })
+
     // we also want to sort them by FirstName on an ascending direction
-    .WithSort(new Sort("FirstName")
-      // and then sort by DateOfDeath on a descending direction
-      .AndThen(new Sort("DateOfDeath", SortDirections.Descending)))
+    .SortBy("FirstName")
+    // and then sort by DateOfDeath on a descending direction
+    .AndThenSortBy("DateOfDeath", SortDirections.Descending)
+
+    // then, we want to paginate the results by skipping 2 and taking 5
+    .WithPage(2, 5)
+
     // finally, we want to explicitly select the following fields
-    .WithSelect(new Select("Id", "FirstName", "Email", "Phone"));
+    .WithSelect("Id", "FirstName", "Email", "Phone");
 
   // second, we pass this query we created to the MakeQuery() method on an IQueryable instance
   return await _dataContext.Users.MakeQuery(query).ToListAsync();
@@ -55,18 +58,14 @@ We can also create the same QueryMaker instance as a JSON (see [sample.json](htt
   {
     "filter": {
       "field": "DateOfBirth",
-      "value": "1990-05",
       "action": 7,
+      "value": "1990-05",
       "and": {
         "fields": [ "FirstName", "LastName" ],
-        "value": [ "JOHN", "DoE" ],
         "action": 1,
+        "value": [ "JOHN", "DoE" ],
         "ignoreCase": true
       }
-    },
-    "page": {
-      "skip": 2,
-      "take": 5
     },
     "sort": {
       "field": "FirstName",
@@ -74,6 +73,10 @@ We can also create the same QueryMaker instance as a JSON (see [sample.json](htt
         "field": "DateOfDeath",
         "direction": 2
       }
+    },
+    "page": {
+      "skip": 2,
+      "take": 5
     },
     "select": {
       "fields": [ "Id", "FirstName", "Email", "Phone" ]
@@ -116,7 +119,7 @@ In both cases, Entity Framework will generate the following SQL query:
 - [x] Add extension to IQueryable interface for direct use on instances
 - [x] Add a method which returns the resulting query and the total count of items without pagination
 - [x] Add functionality for performing pagination using an index
-- [x] Create methods for adding components on a QueryMaker instance
+- [x] Create method implementations for adding components on a QueryMaker instance
 - [ ] Create documentation/tutorial for using the library
 - [ ] Add support for IEnumerable and it's inherited interfaces (IList, ICollection...)
 - [ ] Add static configuration class for setting defaults (i.e. IgnoreCase = true/false by default...)

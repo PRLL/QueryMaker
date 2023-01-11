@@ -1,25 +1,25 @@
 {
   "filter": {
     "field": "DateOfBirth",
-    "value": "1990-05",
     "action": 7,
+    "value": "1990-05",
     "and": {
       "fields": [ "FirstName", "LastName" ],
-      "value": [ "JOHN", "DoE" ],
       "action": 1,
+      "value": [ "JOHN", "DoE" ],
       "ignoreCase": true
+    }
+  },
+  "sort": {
+    "field": "FirstName",
+    "then": {
+      "field": "DateOfDeath",
+      "direction": 2
     }
   },
   "page": {
     "skip": 2,
     "take": 5
-  },
-  "sort": {
-    "field": "FirstName",
-    "then": {
-    "field": "DateOfDeath",
-    "direction": 2
-    }
   },
   "select": {
     "fields": [ "Id", "FirstName", "Email", "Phone" ]

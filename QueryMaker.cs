@@ -195,23 +195,6 @@ namespace QueryMakerLibrary
 		}
 
 		/// <summary>
-		/// Performs selecting on <paramref name="query" /> using <see cref="QueryMakerLibrary.QueryMaker.Select" />  property from this instance.
-		/// </summary>
-		/// <returns>
-		/// An <see cref="System.Linq.IQueryable{T}" /> with added select actions.
-		/// </returns>
-		/// <param name="query">
-		/// <para>Instance of <see cref="System.Linq.IQueryable{T}" /> to add selecting</para>
-		/// NOTE: If set null will throw exception
-		/// </param>
-		/// <exception cref="System.Exception" />
-		public IQueryable<T> Selecting<T>(IQueryable<T> query)
-		{
-			return PerformActions.CreateActionsQuery(query,
-				new QueryMaker(select: this.Select));
-		}
-
-		/// <summary>
 		/// Performs paging actions on <paramref name="query" /> using <see cref="QueryMakerLibrary.QueryMaker.Page" /> property from this instance.
 		/// </summary>
 		/// <returns>
@@ -226,6 +209,23 @@ namespace QueryMakerLibrary
 		{
 			return PerformActions.CreateActionsQuery(query,
 				new QueryMaker(page: this.Page));
+		}
+
+		/// <summary>
+		/// Performs selecting on <paramref name="query" /> using <see cref="QueryMakerLibrary.QueryMaker.Select" />  property from this instance.
+		/// </summary>
+		/// <returns>
+		/// An <see cref="System.Linq.IQueryable{T}" /> with added select actions.
+		/// </returns>
+		/// <param name="query">
+		/// <para>Instance of <see cref="System.Linq.IQueryable{T}" /> to add selecting</para>
+		/// NOTE: If set null will throw exception
+		/// </param>
+		/// <exception cref="System.Exception" />
+		public IQueryable<T> Selecting<T>(IQueryable<T> query)
+		{
+			return PerformActions.CreateActionsQuery(query,
+				new QueryMaker(select: this.Select));
 		}
 
 		/// <summary>
@@ -612,6 +612,47 @@ namespace QueryMakerLibrary
 		}
 
 		/// <summary>
+		/// Add <see cref="QueryMakerLibrary.QueryMaker.Page" /> component to this instance
+		/// </summary>
+		/// <param name="page">
+		/// <para>Instance of <see cref="QueryMakerLibrary.Components.Page" /> to add.</para>
+		/// </param>
+		/// <returns>
+		/// This instance of <see cref="QueryMaker" /> with added <paramref name="Page" /> component.
+		/// </returns>
+		public QueryMaker WithPage(Page page)
+		{
+			Page = page;
+			return this;
+		}
+
+		/// <summary>
+		/// Add <see cref="QueryMakerLibrary.QueryMaker.Page" /> component to this instance
+		/// </summary>
+		/// <param name="skip">
+		/// <para>Quantity of elements to skip on paging action.</para>
+		/// <para>Defaults to 0.</para>
+		/// <para>NOTE: If left as 0 then will not perform skip.</para>
+		/// </param>
+		/// <param name="take">
+		/// <para>Quantity of elements to get on paging action.</para>
+		/// <para>Defaults to 0.</para>
+		/// <para>NOTE: If left as 0 then will not perform take.</para>
+		/// </param>
+		/// <param name="index">
+		/// <para>Field used as index for faster pagination.</para>
+		/// <para>Defaults to empty string.</para>
+		/// <para>NOTE: If left empty, then regular pagination will be performed without using an index.</para>
+		/// </param>
+		/// <returns>
+		/// This instance of <see cref="QueryMaker" /> with added <paramref name="Page" /> component.
+		/// </returns>
+		public QueryMaker WithPage(uint skip = 0, uint take = 0, string index = "")
+		{
+			return WithPage(new (skip, take, index));
+		}
+
+		/// <summary>
 		/// Add <see cref="QueryMakerLibrary.QueryMaker.Select" /> component to this instance
 		/// </summary>
 		/// <param name="select">
@@ -657,47 +698,6 @@ namespace QueryMakerLibrary
 		public QueryMaker WithSelect(string[]? fields = null, string[]? distinctBy = null)
 		{
 			return WithSelect(new Select(fields, distinctBy));
-		}
-
-		/// <summary>
-		/// Add <see cref="QueryMakerLibrary.QueryMaker.Page" /> component to this instance
-		/// </summary>
-		/// <param name="page">
-		/// <para>Instance of <see cref="QueryMakerLibrary.Components.Page" /> to add.</para>
-		/// </param>
-		/// <returns>
-		/// This instance of <see cref="QueryMaker" /> with added <paramref name="Page" /> component.
-		/// </returns>
-		public QueryMaker WithPage(Page page)
-		{
-			Page = page;
-			return this;
-		}
-
-		/// <summary>
-		/// Add <see cref="QueryMakerLibrary.QueryMaker.Page" /> component to this instance
-		/// </summary>
-		/// <param name="skip">
-		/// <para>Quantity of elements to skip on paging action.</para>
-		/// <para>Defaults to 0.</para>
-		/// <para>NOTE: If left as 0 then will not perform skip.</para>
-		/// </param>
-		/// <param name="take">
-		/// <para>Quantity of elements to get on paging action.</para>
-		/// <para>Defaults to 0.</para>
-		/// <para>NOTE: If left as 0 then will not perform take.</para>
-		/// </param>
-		/// <param name="index">
-		/// <para>Field used as index for faster pagination.</para>
-		/// <para>Defaults to empty string.</para>
-		/// <para>NOTE: If left empty, then regular pagination will be performed without using an index.</para>
-		/// </param>
-		/// <returns>
-		/// This instance of <see cref="QueryMaker" /> with added <paramref name="Page" /> component.
-		/// </returns>
-		public QueryMaker WithPage(uint skip = 0, uint take = 0, string index = "")
-		{
-			return WithPage(new (skip, take, index));
 		}
 
 		#endregion Public Instance Methods
@@ -803,26 +803,6 @@ namespace QueryMakerLibrary
 		}
 
 		/// <summary>
-		/// Performs selecting on <paramref name="query" /> using <paramref name="select" /> instance.
-		/// </summary>
-		/// <returns>
-		/// An <see cref="System.Linq.IQueryable{T}" /> with added select actions.
-		/// </returns>
-		/// <param name="query">
-		/// <para>The current instance of <see cref="System.Linq.IQueryable{T}" /></para>
-		/// NOTE: If set null will throw exception
-		/// </param>
-		/// <param name="select">
-		/// The instance of Select
-		/// <para>NOTE: If set null then will not perform selecting and return <paramref name="query" /> as is.</para>
-		/// </param>
-		/// <exception cref="System.Exception" />
-		public static IQueryable<T> Selecting<T>(IQueryable<T> query, Select select)
-		{
-			return new QueryMaker(select: select).MakeQuery(query);
-		}
-
-		/// <summary>
 		/// Performs paging actions on <paramref name="query" /> using <paramref name="page" /> instance.
 		/// </summary>
 		/// <returns>
@@ -840,6 +820,26 @@ namespace QueryMakerLibrary
 		public static IEnumerable<T> Paging<T>(IQueryable<T> query, Page page)
 		{
 			return new QueryMaker(page: page).MakeQuery(query);
+		}
+
+		/// <summary>
+		/// Performs selecting on <paramref name="query" /> using <paramref name="select" /> instance.
+		/// </summary>
+		/// <returns>
+		/// An <see cref="System.Linq.IQueryable{T}" /> with added select actions.
+		/// </returns>
+		/// <param name="query">
+		/// <para>The current instance of <see cref="System.Linq.IQueryable{T}" /></para>
+		/// NOTE: If set null will throw exception
+		/// </param>
+		/// <param name="select">
+		/// The instance of Select
+		/// <para>NOTE: If set null then will not perform selecting and return <paramref name="query" /> as is.</para>
+		/// </param>
+		/// <exception cref="System.Exception" />
+		public static IQueryable<T> Selecting<T>(IQueryable<T> query, Select select)
+		{
+			return new QueryMaker(select: select).MakeQuery(query);
 		}
 
 		#endregion Public Static Methods

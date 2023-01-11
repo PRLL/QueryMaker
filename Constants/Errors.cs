@@ -28,7 +28,8 @@ namespace QueryMakerLibrary.Constants
 			ClassMembersNoOperation = "Passed a Filter object without 'Fields', tried using fields and properties from root class and multiple where found, "
 				+ "but no 'FieldsOperation' was passed to join them",
 			MultipleFieldsNoOperation = "Passed a Filter object with multiple 'Fields', but value on 'FieldsOperation' is not a valid operation",
-			FieldTypeNull = "Passed Field {0} was null";
+			FieldTypeNull = "Passed Field {0} was null",
+			AddingSort = "Cannot set ThenSortBy because there's no root Sort set";
 
 		internal static Exception Exception(string errorMessage)
 		{

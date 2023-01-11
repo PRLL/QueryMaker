@@ -64,9 +64,36 @@ namespace QueryMakerLibrary.Components
 		/// <summary>
 		/// <para>Add sorting to be performed after this one</para>
 		/// </summary>
+		/// <param name="sort">
+		/// <para>Instance of <see cref="Sort" /> to perform after this one.</para>
+		/// </param>
 		public Sort AndThen(Sort sort)
 		{
 			Then = sort;
+			return this;
+		}
+
+		/// <summary>
+		/// <para>Add sorting to be performed after this one</para>
+		/// </summary>
+		/// <param name="field">
+		/// <para>Field to sort by.</para>
+		/// <para>Defaults to empty string value.</para>
+		/// <para>NOTE: If left empty or null, then will throw exception.</para>
+		/// </param>
+		/// <param name="direction">
+		/// <para>Sorting direction.</para>
+		/// <para>Refer to <see cref="QueryMakerLibrary.Components.Sort.SortDirections" /> for possible values</para>
+		/// <para>Defaults to <see cref="QueryMakerLibrary.Components.Sort.SortDirections.Ascending" />.</para>
+		/// <para>NOTE: If not a valid direction, then will throw exception.</para>
+		/// </param>
+		/// <param name="then">
+		/// <para>Sorting performed after this one.</para>
+		/// <para>Defaults to null.</para>
+		/// </param>
+		public Sort AndThen(string field, SortDirections direction = SortDirections.Ascending, Sort? then = null)
+		{
+			Then = new (field, direction, then);
 			return this;
 		}
 

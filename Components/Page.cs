@@ -10,11 +10,6 @@ namespace QueryMakerLibrary.Components
 		/// <summary>
 		/// Initializes a new instance of the <see cref="QueryMakerLibrary.Components.Page" /> class with an index.
 		/// </summary>
-		/// <param name="index">
-		/// <para>Field used as index for faster pagination.</para>
-		/// <para>Defaults to empty string.</para>
-		/// <para>NOTE: If left empty, then pagination will be performed without an index.</para>
-		/// </param>
 		/// <param name="skip">
 		/// <para>Quantity of elements to skip on paging action.</para>
 		/// <para>Defaults to 0.</para>
@@ -24,6 +19,11 @@ namespace QueryMakerLibrary.Components
 		/// <para>Quantity of elements to get on paging action.</para>
 		/// <para>Defaults to 0.</para>
 		/// <para>NOTE: If left as 0 then will not perform take action.</para>
+		/// </param>
+		/// <param name="index">
+		/// <para>Field used as index for faster pagination.</para>
+		/// <para>Defaults to empty string.</para>
+		/// <para>NOTE: If left empty, then pagination will be performed without an index.</para>
 		/// </param>
 		public Page(uint skip = 0, uint take = 0, string index = "")
 		{

@@ -18,6 +18,38 @@ namespace QueryMakerLibrary.Components
 		}
 
 		/// <summary>
+		/// <para>Initializes a new instance of <see cref="QueryMakerLibrary.Components.Filter" /> class.</para>
+		/// </summary>
+		/// <param name="field">
+		/// <para>Field to perform filtering on.</para>
+		/// <para>If performing filtering on a primitive type enumerable (like a list of strings) then can leave empty.</para>
+		/// </param>
+		/// <param name="action">
+		/// <para>Action to perform.</para>
+		/// <para>Refer to <see cref="QueryMakerLibrary.Components.Filter.FilterActions" /> for possible values.</para>
+		/// <para>NOTE: If not set to a valid <see cref="QueryMakerLibrary.Components.Filter.FilterActions" /> value, will throw exception when performing filtering.</para>
+		/// </param>
+		/// <param name="value">
+		/// <para>Value to filter by.</para>
+		/// </param>
+		/// <param name="ignoreCase">
+		/// <para>Set true to ignore case sensitivity on evaluation performed on filtering.</para>
+		/// <para>Defaults to true.</para>
+		/// </param>
+		/// <param name="negate">
+		/// <para>Set true to negate evaluation performed on filtering.</para>
+		/// <para>Defaults to false.</para>
+		/// </param>
+		public Filter(string field, FilterActions action, object? value, bool ignoreCase = true, bool negate = false)
+		{
+			Field = field;
+			Action = action;
+			Value = value;
+			IgnoreCase = ignoreCase;
+			Negate = negate;
+		}
+
+		/// <summary>
 		/// <para>Initializes a new instance of <see cref="QueryMakerLibrary.Components.Filter" /> class with required parameters for performing filtering using multiple fields.</para>
 		/// </summary>
 		/// <param name="fields">
@@ -52,38 +84,6 @@ namespace QueryMakerLibrary.Components
 			Action = action;
 			Fields = fields;
 			FieldsOperation = fieldsOperation;
-			IgnoreCase = ignoreCase;
-			Negate = negate;
-		}
-
-		/// <summary>
-		/// <para>Initializes a new instance of <see cref="QueryMakerLibrary.Components.Filter" /> class with required parameters for performing filtering.</para>
-		/// </summary>
-		/// <param name="field">
-		/// <para>Field to perform filtering on.</para>
-		/// <para>If performing filtering on a primitive type enumerable (like a list of strings) then can leave empty.</para>
-		/// </param>
-		/// <param name="action">
-		/// <para>Action to perform.</para>
-		/// <para>Refer to <see cref="QueryMakerLibrary.Components.Filter.FilterActions" /> for possible values.</para>
-		/// <para>NOTE: If not set to a valid <see cref="QueryMakerLibrary.Components.Filter.FilterActions" /> value, will throw exception when performing filtering.</para>
-		/// </param>
-		/// <param name="value">
-		/// <para>Value to filter by.</para>
-		/// </param>
-		/// <param name="ignoreCase">
-		/// <para>Set true to ignore case sensitivity on evaluation performed on filtering.</para>
-		/// <para>Defaults to true.</para>
-		/// </param>
-		/// <param name="negate">
-		/// <para>Set true to negate evaluation performed on filtering.</para>
-		/// <para>Defaults to false.</para>
-		/// </param>
-		public Filter(string field, FilterActions action, object? value, bool ignoreCase = true, bool negate = false)
-		{
-			Field = field;
-			Action = action;
-			Value = value;
 			IgnoreCase = ignoreCase;
 			Negate = negate;
 		}
@@ -288,11 +288,8 @@ namespace QueryMakerLibrary.Components
 		/// </summary>
 		public Filter AndAlso(params Filter[] subfilters)
 		{
-			if (subfilters is not null)
-			{
-				SubFiltersOperation = FilterOperations.AndAlso;
-				SubFilters = subfilters;
-			}
+			SubFiltersOperation = FilterOperations.AndAlso;
+			SubFilters = subfilters;
 			return this;
 		}
 
@@ -301,11 +298,8 @@ namespace QueryMakerLibrary.Components
 		/// </summary>
 		public Filter OrElse(params Filter[] subfilters)
 		{
-			if (subfilters is not null)
-			{
-				SubFiltersOperation = FilterOperations.OrElse;
-				SubFilters = subfilters;
-			}
+			SubFiltersOperation = FilterOperations.OrElse;
+			SubFilters = subfilters;
 			return this;
 		}
 

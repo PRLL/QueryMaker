@@ -40,13 +40,31 @@ namespace QueryMakerLibrary.Components
 		/// <para>Set true to negate evaluation performed on filtering.</para>
 		/// <para>Defaults to false.</para>
 		/// </param>
-		public Filter(string field, FilterActions action, object? value, bool ignoreCase = true, bool negate = false)
+		/// <param name="and">
+		/// <para>Add subfilters to be performed after this one with AndAlso evaluation.</para>
+		/// <para>Defaults to null.</para>
+		/// </param>
+		/// <param name="or">
+		/// <para>Add subfilters to be performed after this one with OrElse evaluation.</para>
+		/// <para>Defaults to null.</para>
+		/// </param>
+		public Filter(string field, FilterActions action, object? value, bool ignoreCase = true, bool negate = false, Filter? and = null, Filter? or = null)
 		{
 			Field = field;
 			Action = action;
 			Value = value;
 			IgnoreCase = ignoreCase;
 			Negate = negate;
+			
+			if (and is not null)
+			{
+				And = and;
+			}
+			
+			if (or is not null)
+			{
+				Or = or;
+			}
 		}
 
 		/// <summary>

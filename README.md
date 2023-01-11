@@ -31,22 +31,32 @@ Now that you have the `QueryMakerLibrary` on your project, you can make a query 
   ```csharp
   // first, we create an instance of QueryMaker with the components we want to use
   // they are all optional, but for this sample we will use them all
-  QueryMaker query = new QueryMaker()
-    // say we want to filter the users which their DateOfBirth is Greater Than Or Equal to May 1990
-    .FilterBy("DateOfBirth", FilterActions.GreaterThanOrEqual, "1990-05")
-    // and also their FirstName or LastName contains 'John' or 'Doe' ignoring case sensitivity
-    .AndAlsoFilterBy(new string[] { "FirstName", "LastName" }, FilterActions.Contains, new object?[] { "joHN", "DoE" })
+  QueryMaker query = new QueryMaker (
+    // let's say we want to filter the users which their DateOfBirth is Greater Than Or Equal to May 1990
+    // and also their FirstName OR LastName contains 'John' or 'Doe'
+    filter: new Filter(
+      field: "DateOfBirth",
+      action: FilterActions.GreaterThanOrEqual,
+      value: "1990-05",
+      and: new Filter(
+        fields: new string[] { "FirstName", "LastName" },
+        action: FilterActions.Contains,
+        value: new object?[] { "JOHN", "DoE" },
+        ignoreCase: true)),
 
-    // we also want to sort them by FirstName on an ascending direction
-    .SortBy("FirstName")
-    // and then sort by DateOfDeath on a descending direction
-    .AndThenSortBy("DateOfDeath", SortDirections.Descending)
+    // we want them sorted by FirstName on ascending direction
+    // and then sorted by DateOfDeath on a descending direction
+    sort: new Sort(
+      field: "FirstName",
+      then: new Sort(
+        field: "DateOfDeath",
+        direction: SortDirections.Descending)),
 
-    // then, we want to paginate the results by skipping 2 and taking 5
-    .WithPage(2, 5)
+    // also, we want to page the results by skipping 2 and taking 5
+    page: new Page(skip: 2, take: 5),
 
     // finally, we want to explicitly select the following fields
-    .WithSelect("Id", "FirstName", "Email", "Phone");
+    select: new Select("Id", "FirstName", "Email", "Phone"));
 
   // second, we pass this query we created to the MakeQuery() method on an IQueryable instance
   return await _dataContext.Users.MakeQuery(query).ToListAsync();

@@ -26,7 +26,7 @@ First, [install NuGet](http://docs.nuget.org/docs/start-here/installing-nuget). 
 
 ## How To Use
 
-Now that you have the `QueryMakerLibrary` on your project, you can make a query using the `MakeQuery()` method.  as shown on the following sample:
+Now that you have the `QueryMakerLibrary` on your project, you can make a query using the `MakeQuery()` method as shown on the following sample:
 
   ```csharp
   // first, we create an instance of QueryMaker with the components we want to use

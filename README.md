@@ -1,6 +1,6 @@
 ## What is QueryMaker?
 
-QueryMaker is a .NET library built from the ground up using LINQ Expressions which provides the tools for making complex queries in a dynamic fashion via simple components. This components allow for performing multi-layered filtering with automatic type conversions, sorting, selecting and paging.
+QueryMaker is a .NET library built from the ground up using LINQ Expressions which provides the tools for making complex queries in a dynamic fashion via simple components. These components allow for performing multi-layered filtering with automatic type conversions, sorting, selecting and paging.
 
 <br />
 

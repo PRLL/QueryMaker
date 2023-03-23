@@ -137,18 +137,18 @@ namespace QueryMakerLibrary
 			return query;
 		}
 
-		private static IQueryable<T> CreatePagedQuery<T>(IQueryable<T> unfilterQuery, IQueryable<T> filteredQuery, Page? page = null)
+		private static IQueryable<T> CreatePagedQuery<T>(IQueryable<T> unfilteredQuery, IQueryable<T> filteredQuery, Page? page = null)
 		{
 			if (page is not null)
 			{
 				if (page.Skip > 0)
 				{
-					filteredQuery = filteredQuery.Skip((int)page.Skip);
+					filteredQuery = filteredQuery.Skip(page.Skip);
 				}
 
 				if (page.Take > 0)
 				{
-					filteredQuery = filteredQuery.Take((int)page.Take);
+					filteredQuery = filteredQuery.Take(page.Take);
 				}
 
 				if (!string.IsNullOrWhiteSpace(page.Index))
@@ -156,7 +156,7 @@ namespace QueryMakerLibrary
 					ParameterExpression parameterExpression = Expression.Parameter(typeof(T), Miscellaneous.INSTANCE);
 					MemberExpression memberExpression = MemberMethods.GetPropertyOrField<T>(parameterExpression, page.Index);
 
-					return unfilterQuery.Where(Expression.Lambda<Func<T, bool>>(
+					return unfilteredQuery.Where(Expression.Lambda<Func<T, bool>>(
 						Expression.Call(
 							EnumerableMethods.GetEnumerableTypedMethod(memberExpression.Type,
 								EnumMethods.GetActionText(Filter.FilterActions.Contains)),

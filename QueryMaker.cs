@@ -59,7 +59,7 @@ namespace QueryMakerLibrary
 
 		private Sort? DeepestSort
 		{
-			get => _deepestSort ?? throw new NullReferenceException(Errors.AddingSort);
+			get => _deepestSort;
 			set
 			{
 				_deepestSort = value;
@@ -647,7 +647,7 @@ namespace QueryMakerLibrary
 		/// <returns>
 		/// This instance of <see cref="QueryMaker" /> with added <see cref="Page" /> component.
 		/// </returns>
-		public QueryMaker WithPage(uint skip = 0, uint take = 0, string index = "")
+		public QueryMaker WithPage(int skip = 0, int take = 0, string index = "")
 		{
 			return WithPage(new (skip, take, index));
 		}

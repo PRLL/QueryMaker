@@ -3,30 +3,50 @@ namespace QueryMakerLibrary
 	/// <summary>
 	/// Class used for returning results of QueryMaker operations.
 	/// </summary>
-	public sealed class QueryMakerResult<T>
+	public struct QueryMakerResult<T>
 	{
-		private QueryMakerResult(IQueryable<T>? result, int? totalCount)
+		private int _totalCount = 0;
+
+		internal QueryMakerResult(IQueryable<T>? result, IQueryable<T>? totalCount)
 		{
 			Result = result;
-			TotalCount = totalCount;
+			TotalCountQuery = totalCount;
 		}
 
-		internal static QueryMakerResult<T> Construct(IQueryable<T>? result, int? totalCount)
+		private IQueryable<T>? TotalCountQuery { get; init; } = null;
+		private bool PerformedCount { get; set; } = false;
+
+		/// <summary>
+		/// <para>Resulting IQueryable after performing all provided <see cref="QueryMaker" /> operations.</para>
+		/// <para>Defaults to null.</para>
+		/// </summary>
+		public IQueryable<T>? Result { get; private init; } = null;
+
+
+		/// <summary>
+		/// <para>Number of total resulting items without pagination.</para>
+		/// <para>Defaults to 0.</para>
+		/// </summary>
+		public int TotalCount
 		{
-			return new QueryMakerResult<T>(result, totalCount);
+			get
+			{
+				if (!PerformedCount && TotalCountQuery is not null)
+				{
+					try
+					{
+						_totalCount = TotalCountQuery.Count();
+					}
+					catch
+					{
+						_totalCount = 0;
+					}
+
+					PerformedCount = true;
+				}
+
+				return _totalCount;
+			}
 		}
-
-		/// <summary>
-		/// <para>Resulting IQueryable after performing all operations.</para>
-		/// <para>Defaults to null.</para>
-		/// </summary>
-		public IQueryable<T>? Result { get; private set; } = null;
-
-		/// <summary>
-		/// <para>Number of total resulting items withouth pagination.</para>
-		/// <para>Defaults to null.</para>
-		/// <para>NOTE: If didn't specify wanted to perform count, then will return null.</para>
-		/// </summary>
-		public int? TotalCount { get; private set; } = null;
 	}
 }

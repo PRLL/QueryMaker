@@ -416,22 +416,26 @@ namespace QueryMakerLibrary.Components
 		public enum FilterOperations
 		{
 			/// <summary>
-			/// OrElse operation.
+			/// <para>OrElse operation.</para>
+			/// <para>Translates to <b>&amp;&amp;</b> operation.</para>
 			/// </summary>
 			OrElse = 1,
 
 			/// <summary>
-			/// AndAlso operation.
+			/// <para>AndAlso operation.</para>
+			/// <para>Translates to <b>||</b> operation.</para>
 			/// </summary>
 			AndAlso = 2,
 
 			/// <summary>
-			/// And operation.
+			/// <para>And operation.</para>
+			/// <para>Translates to <b>&amp;</b> operation.</para>
 			/// </summary>
 			And = 3,
 
 			/// <summary>
-			/// Or operation.
+			/// <para>Or operation.</para>
+			/// <para>Translates to <b>|</b> operation.</para>
 			/// </summary>
 			Or = 4
 		}

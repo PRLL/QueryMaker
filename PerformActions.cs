@@ -10,7 +10,7 @@ namespace QueryMakerLibrary
 	{
 		#region Internal Methods
 
-		internal static QueryMakerResult<T> CreateActionsResult<T>(IQueryable<T> query, QueryMaker queryMaker, bool getTotalCount)
+		internal static QueryMakerResult<T> CreateActionsResult<T>(IQueryable<T> query, QueryMaker queryMaker)
 		{
 			if (query is null)
 			{
@@ -19,7 +19,7 @@ namespace QueryMakerLibrary
 
 			IQueryable<T> filteredQuery = CreateFilteredQuery(query, queryMaker.Filter);
 
-			return QueryMakerResult<T>.Construct(
+			return new(
 				CreateSelectedQuery(
 					CreatePagedQuery(
 						query,
@@ -27,7 +27,10 @@ namespace QueryMakerLibrary
 							queryMaker.Sort),
 						queryMaker.Page),
 					queryMaker.Select),
-				getTotalCount ? filteredQuery.Count() : null);
+				CountDistinctBy(filteredQuery,
+					(queryMaker.Select is not null
+						? queryMaker.Select.DistinctBy
+						: new string[0])));
 		}
 
 		internal static IQueryable<T> CreateActionsQuery<T>(IQueryable<T> query, QueryMaker queryMaker)
@@ -121,7 +124,7 @@ namespace QueryMakerLibrary
 
 					return query.GroupBy(SelectMethods.CreateObjectSelectExpression<T>(parameterExpression, select.DistinctBy))
 					.Select(grp => grp.AsQueryable()
-						.Select(SelectMethods.CreateObjectSelectExpression<T>(parameterExpression, 
+						.Select(SelectMethods.CreateObjectSelectExpression<T>(parameterExpression,
 							select.Fields.Any() ? select.Fields : select.DistinctBy))
 						.First());
 				}
@@ -132,6 +135,18 @@ namespace QueryMakerLibrary
 						Expression.Parameter(typeof(T), Miscellaneous.INSTANCE),
 						select.Fields));
 				}
+			}
+
+			return query;
+		}
+
+		private static IQueryable<T> CountDistinctBy<T>(IQueryable<T> query, params string[] distinctBy)
+		{
+			if (distinctBy.Any())
+			{
+				ParameterExpression parameterExpression = Expression.Parameter(typeof(T), Miscellaneous.INSTANCE);
+				return query.GroupBy(SelectMethods.CreateObjectSelectExpression<T>(parameterExpression, distinctBy))
+					.Select(x => x.Key);
 			}
 
 			return query;

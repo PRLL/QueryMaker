@@ -114,22 +114,18 @@ namespace QueryMakerLibrary
 		/// Adds expressions to <paramref name="query" /> using properties from this instance.
 		/// </summary>
 		/// <returns>
-		/// Instance of <see cref="QueryMakerLibrary.QueryMakerResult{T}" /> with resulting query and count of unpaginated results if specified.
+		/// Instance of <see cref="QueryMakerLibrary.QueryMakerResult{T}" /> with resulting query and count of unpaginated results.
 		/// </returns>
 		/// <param name="query">
 		/// <para>Instance of <see cref="System.Linq.IQueryable{T}" /> to add expressions</para>
 		/// NOTE: If set null will throw exception
 		/// </param>
-		/// <param name="getTotalCount">
-		/// <para>Set to true to return count of unpaginated results on <see cref="QueryMakerLibrary.QueryMakerResult{T}.TotalCount" /> property</para>
-		/// NOTE: Defaults to false
-		/// </param>
 		/// <exception cref="System.Exception" />
-		public QueryMakerResult<T> MakeQueryResult<T>(IQueryable<T> query, bool getTotalCount)
+		public QueryMakerResult<T> MakeQueryResult<T>(IQueryable<T> query)
 		{
 			try
 			{
-				return PerformActions.CreateActionsResult(query, this, getTotalCount);
+				return PerformActions.CreateActionsResult(query, this);
 			}
 			catch (Exception exception)
 			{
@@ -708,7 +704,7 @@ namespace QueryMakerLibrary
 		/// Adds expressions to <paramref name="query" /> using properties from <paramref name="queryMaker" /> instance.
 		/// </summary>
 		/// <returns>
-		/// Instance of <see cref="QueryMakerLibrary.QueryMakerResult{T}" /> with resulting query and count of unpaginated results if specified.
+		/// Instance of <see cref="QueryMakerLibrary.QueryMakerResult{T}" /> with resulting query and count of unpaginated results.
 		/// </returns>
 		/// <param name="query">
 		/// <para>Instance of <see cref="System.Linq.IQueryable{T}" /> to add expressions</para>
@@ -718,16 +714,12 @@ namespace QueryMakerLibrary
 		/// Instance of QueryMaker class with components of actions to perform
 		/// <para>NOTE: If set null then will perform no actions and return  and return <paramref name="query" /> as is.</para>
 		/// </param>
-		/// <param name="getTotalCount">
-		/// <para>Set to true to return count of unpaginated results on <see cref="QueryMakerLibrary.QueryMakerResult{T}.TotalCount" /> property</para>
-		/// NOTE: Defaults to false
-		/// </param>
 		/// <exception cref="System.Exception" />
-		public static QueryMakerResult<T> MakeQueryResult<T>(IQueryable<T> query, QueryMaker queryMaker, bool getTotalCount)
+		public static QueryMakerResult<T> MakeQueryResult<T>(IQueryable<T> query, QueryMaker queryMaker)
 		{
 			try
 			{
-				return queryMaker.MakeQueryResult(query, getTotalCount);
+				return queryMaker.MakeQueryResult(query);
 			}
 			catch (Exception exception)
 			{

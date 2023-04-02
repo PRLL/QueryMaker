@@ -29,7 +29,9 @@ namespace QueryMakerLibrary.Constants
 				+ "but no 'FieldsOperation' was passed to join them",
 			MultipleFieldsNoOperation = "Passed a Filter object with multiple 'Fields', but value on 'FieldsOperation' is not a valid operation",
 			FieldTypeNull = "Passed Field {0} was null",
-			AddingSort = "Cannot set ThenSortBy because there's no root Sort set";
+			AddingSort = "Cannot set ThenSortBy because there's no root Sort set",
+			GetResulTotalCount = $"Error ocurred while getting '{nameof(QueryMakerResult<object>.TotalCount)}' on '{nameof(QueryMakerResult<object>)}' instance",
+			GetResulItems = $"Error ocurred while getting '{nameof(QueryMakerResult<object>.Items)}' on '{nameof(QueryMakerResult<object>.Items)}' instance";
 
 		internal static Exception Exception(string errorMessage)
 		{

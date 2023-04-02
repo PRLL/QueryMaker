@@ -20,13 +20,13 @@ namespace QueryMakerLibrary
 			IQueryable<T> filteredQuery = CreateFilteredQuery(query, queryMaker.Filter);
 
 			return new(
-				CreateSelectedQuery(
-					CreatePagedQuery(
-						query,
+				CreatePagedQuery(
+					query,
+					CreateSelectedQuery(
 						CreateSortedQuery(filteredQuery,
 							queryMaker.Sort),
-						queryMaker.Page),
-					queryMaker.Select),
+						queryMaker.Select),
+					queryMaker.Page),
 				CountDistinctBy(filteredQuery,
 					(queryMaker.Select is not null
 						? queryMaker.Select.DistinctBy
@@ -40,16 +40,15 @@ namespace QueryMakerLibrary
 				throw Errors.Exception(Errors.IQueryableNull);
 			}
 
-			return
+			return CreatePagedQuery(
+				query,
 				CreateSelectedQuery(
-					CreatePagedQuery(
-						query,
-						CreateSortedQuery(
-							CreateFilteredQuery(query,
-								queryMaker.Filter),
-							queryMaker.Sort),
-						queryMaker.Page),
-					queryMaker.Select);
+					CreateSortedQuery(
+						CreateFilteredQuery(query,
+							queryMaker.Filter),
+						queryMaker.Sort),
+					queryMaker.Select),
+				queryMaker.Page);
 		}
 
 		#endregion Internal Methods

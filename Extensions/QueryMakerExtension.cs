@@ -23,7 +23,7 @@ namespace QueryMakerLibrary.Extensions
 		{
 			try
 			{
-				return queryMaker is null ? new(query, null) : queryMaker.MakeQueryResult(query);
+				return queryMaker is null ? new(query, query) : queryMaker.MakeQueryResult(query);
 			}
 			catch (Exception exception)
 			{

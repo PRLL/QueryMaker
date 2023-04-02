@@ -34,7 +34,7 @@ namespace QueryMakerLibrary
 				{
 					try
 					{
-						_items = ItemsQuery.AsEnumerable();
+						_items = ItemsQuery.ToList();
 					}
 					catch
 					{

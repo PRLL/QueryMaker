@@ -17,20 +17,20 @@ namespace QueryMakerLibrary
 				throw Errors.Exception(Errors.IQueryableNull);
 			}
 
-			IQueryable<T> filteredQuery = CreateFilteredQuery(query, queryMaker.Filter);
+			IQueryable<T> unpaginatedQuery =
+				CreateSelectedQuery(
+					CreateSortedQuery(
+						CreateFilteredQuery(query,
+							queryMaker.Filter),
+						queryMaker.Sort),
+					queryMaker.Select);
 
 			return new(
 				CreatePagedQuery(
 					query,
-					CreateSelectedQuery(
-						CreateSortedQuery(filteredQuery,
-							queryMaker.Sort),
-						queryMaker.Select),
+					unpaginatedQuery,
 					queryMaker.Page),
-				CountDistinctBy(filteredQuery,
-					(queryMaker.Select is not null
-						? queryMaker.Select.DistinctBy
-						: new string[0])));
+				unpaginatedQuery);
 		}
 
 		internal static IQueryable<T> CreateActionsQuery<T>(IQueryable<T> query, QueryMaker queryMaker)
@@ -115,37 +115,22 @@ namespace QueryMakerLibrary
 
 		private static IQueryable<T> CreateSelectedQuery<T>(IQueryable<T> query, Select? select = null)
 		{
-			if (select is not null)
+			if (select is not null
+				&& select.Fields.Any())
 			{
-				if (select.DistinctBy.Any())
+				if (select.DistinctBy)
 				{
-					ParameterExpression parameterExpression = Expression.Parameter(typeof(T), Miscellaneous.INSTANCE);
-
-					return query.GroupBy(SelectMethods.CreateObjectSelectExpression<T>(parameterExpression, select.DistinctBy))
-					.Select(grp => grp.AsQueryable()
-						.Select(SelectMethods.CreateObjectSelectExpression<T>(parameterExpression,
-							select.Fields.Any() ? select.Fields : select.DistinctBy))
-						.First());
+					return query.GroupBy(SelectMethods.CreateObjectSelectExpression<T>(
+						Expression.Parameter(typeof(T), Miscellaneous.INSTANCE),
+						select.Fields))
+					.Select(group => group.Key);
 				}
-
-				if (select.Fields.Any())
+				else
 				{
 					return query.Select(SelectMethods.CreateObjectSelectExpression<T>(
 						Expression.Parameter(typeof(T), Miscellaneous.INSTANCE),
 						select.Fields));
 				}
-			}
-
-			return query;
-		}
-
-		private static IQueryable<T> CountDistinctBy<T>(IQueryable<T> query, params string[] distinctBy)
-		{
-			if (distinctBy.Any())
-			{
-				ParameterExpression parameterExpression = Expression.Parameter(typeof(T), Miscellaneous.INSTANCE);
-				return query.GroupBy(SelectMethods.CreateObjectSelectExpression<T>(parameterExpression, distinctBy))
-					.Select(x => x.Key);
 			}
 
 			return query;

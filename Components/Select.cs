@@ -3,59 +3,57 @@ using QueryMakerLibrary.Logic;
 namespace QueryMakerLibrary.Components
 {
 	/// <summary>
-	/// Class for select component set on property <see cref="QueryMakerLibrary.QueryMaker.Select" />.
+	/// Class for select component set on property <see cref="QueryMaker.Select" />.
 	/// </summary>
 	public sealed class Select
 	{
 		#region Constructors
 
 		/// <summary>
-		/// Initializes a new instance of <see cref="QueryMakerLibrary.Components.Select" /> class with all properties set to their defaults.
+		/// Initializes a new instance of <see cref="Select" /> class with all properties set to their defaults.
 		/// </summary>
 		public Select()
+			: this(Array.Empty<string>(), false)
 		{
 			//
 		}
 
 		/// <summary>
-		/// Initializes a new instance of <see cref="QueryMakerLibrary.Components.Select" /> class.
-		/// <para>Note: If left <paramref name="fields" /> empty then will return query as is.</para>
-		/// </summary>
-		/// <param name="fields">
-		/// <para>Fields to select.</para>
-		/// </param>
-		public Select(params string[] fields)
-		{
-			Fields = fields;
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="QueryMakerLibrary.Components.Select" /> class.
-		/// <para>Note: If both properties are empty then will return query as is.</para>
+		/// Initializes a new instance of <see cref="Select" /> class.
+		/// <para>Note: If <paramref name="fields" /> is left empty then will return query as is.</para>
 		/// </summary>
 		/// <param name="fields">
 		/// <para>Fields to select on query.</para>
-		/// <para>Defaults to empty string array.</para>
-		/// <para>NOTE: If left empty will not perform selection.</para>
+		/// </param>
+		public Select(params string[] fields)
+			: this(fields, false)
+		{
+			//
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Select" /> class.
+		/// <para>Note: If <paramref name="fields" /> is left empty then will return query as is.</para>
+		/// </summary>
+		/// <param name="fields">
+		/// <para>Fields to select on query.</para>
 		/// </param>
 		/// <param name="distinctBy">
-		/// <para>Fields to distinguish query by. 
-		/// If <see cref="QueryMakerLibrary.Components.Select.Fields" /> property is left empty, then selection will be performed using this fields</para>
-		/// <para>Defaults to empty string array.</para>
-		/// <para>NOTE: If left empty distinction will not be performed.</para>
+		/// <para>If set to true, will return resulting items which values are distinct on <see cref="Fields" />.</para>
+		/// <para>If <see cref="Fields" /> property is left empty, then will not perform ditinct by operation.</para>
+		/// <para>Defaults to false.</para>
 		/// </param>
-		public Select(string[]? fields = null, string[]? distinctBy = null)
+		public Select(string[] fields, bool distinctBy)
 		{
-			Fields = fields ?? new string[0];
-			DistinctBy = distinctBy ?? new string[0];
+			Fields = fields;
+			DistinctBy = distinctBy;
 		}
 
 		#endregion Constructors
 
 		#region Private Fields
 
-		private string[] _fields = new string[0];
-		private string[] _distinctBy = new string[0];
+		private string[] _fields = Array.Empty<string>();
 
 		#endregion Private Fields
 
@@ -69,26 +67,15 @@ namespace QueryMakerLibrary.Components
 		public string[] Fields
 		{
 			get => _fields;
-			set
-			{
-				_fields = PropertyMethods.CleanFieldsArray(value ?? new string[0]);
-			}
+			set => _fields = PropertyMethods.CleanFieldsArray(value ?? Array.Empty<string>());
 		}
 
 		/// <summary>
-		/// <para>Fields to distinguish query by. 
-		/// If <see cref="QueryMakerLibrary.Components.Select.Fields" /> property is left empty, then selection will be performed using this fields</para>
-		/// <para>Defaults to empty string array.</para>
-		/// <para>NOTE: If left empty distinction will not be performed.</para>
+		/// <para>If set to true, will return resulting items which values are distinct on provided <see cref="Fields" />.</para>
+		/// <para>If <see cref="Fields" /> property is left empty, then will not perform ditinct by operation.</para>
+		/// <para>Defaults to false.</para>
 		/// </summary>
-		public string[] DistinctBy
-		{
-			get => _distinctBy;
-			set
-			{
-				_distinctBy = PropertyMethods.CleanFieldsArray(value ?? new string[0]);
-			}
-		}
+		public bool DistinctBy { get; set; } = false;
 
 		#endregion Public Properties
 	}

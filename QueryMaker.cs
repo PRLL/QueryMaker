@@ -664,7 +664,7 @@ namespace QueryMakerLibrary
 		/// Add <see cref="QueryMakerLibrary.QueryMaker.Select" /> component to this instance
 		/// </summary>
 		/// <param name="fields">
-		/// <para>Fields to select.</para>
+		/// <para>Fields to select on query.</para>
 		/// </param>
 		/// <returns>
 		/// This instance of <see cref="QueryMaker" /> with added <see cref="Select" /> component.
@@ -675,25 +675,18 @@ namespace QueryMakerLibrary
 		}
 
 		/// <summary>
-		/// Add <see cref="QueryMakerLibrary.QueryMaker.Select" /> component to this instance
+		/// Add <see cref="QueryMakerLibrary.QueryMaker.Select" /> component to this instance with distinct by operation.
+		/// <para>Note: If <paramref name="fields" /> is left empty then will return query as is.</para>
 		/// </summary>
 		/// <param name="fields">
-		/// <para>Fields to select on query.</para>
-		/// <para>Defaults to empty string array.</para>
-		/// <para>NOTE: If left empty will not perform selection.</para>
-		/// </param>
-		/// <param name="distinctBy">
-		/// <para>Fields to distinguish query by. 
-		/// If <see cref="QueryMakerLibrary.Components.Select.Fields" /> property is left empty, then selection will be performed using this fields</para>
-		/// <para>Defaults to empty string array.</para>
-		/// <para>NOTE: If left empty distinction will not be performed.</para>
+		/// <para>Fields by which to distinct by.</para>
 		/// </param>
 		/// <returns>
 		/// This instance of <see cref="QueryMaker" /> with added <see cref="Select" /> component.
 		/// </returns>
-		public QueryMaker WithSelect(string[]? fields = null, string[]? distinctBy = null)
+		public QueryMaker WithDistinctBy(params string[] fields)
 		{
-			return WithSelect(new Select(fields, distinctBy));
+			return WithSelect(new Select(fields, true));
 		}
 
 		#endregion Public Instance Methods

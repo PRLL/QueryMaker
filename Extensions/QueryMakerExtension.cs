@@ -6,7 +6,7 @@ namespace QueryMakerLibrary.Extensions
 	public static class QueryMakerExtension
 	{
 		/// <summary>
-		/// Extension method which adds <see cref="QueryMakerLibrary.QueryMaker.MakeQueryResult{T}(IQueryable{T}, bool)" /> to instances of <see cref="System.Linq.IQueryable{T}" />
+		/// Extension method which adds <see cref="QueryMaker.MakeQueryResult{T}(IQueryable{T})" /> to instances of <see cref="System.Linq.IQueryable{T}" />
 		/// </summary>
 		/// <returns>
 		/// Instance of <see cref="QueryMakerLibrary.QueryMakerResult{T}" /> with resulting query and count of unpaginated results.

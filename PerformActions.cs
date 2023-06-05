@@ -17,16 +17,25 @@ namespace QueryMakerLibrary
 				throw Errors.Exception(Errors.IQueryableNull);
 			}
 
-			IQueryable<T> unpaginatedQuery =
-				CreateSelectedQuery(
-					CreateSortedQuery(
-						CreateFilteredQuery(query,
-							queryMaker.Filter),
-						queryMaker.Sort),
-					queryMaker.Select);
+			IQueryable<T> filteredQuery = CreateFilteredQuery(query, queryMaker.Filter);
 
-			return new(
-				CreatePagedQuery(
+			IQueryable<T> unpaginatedQuery =
+				CreateSortedQuery(
+					CreateSelectedQuery(
+						filteredQuery,
+						queryMaker.Select),
+					queryMaker.Sort);
+
+			return new(queryMaker.Page is not null && !string.IsNullOrWhiteSpace(queryMaker.Page.Index)
+				? CreateSelectedQuery(
+					CreatePagedQuery(
+						query,
+						CreateSortedQuery(
+							filteredQuery,
+							queryMaker.Sort),
+						queryMaker.Page),
+					queryMaker.Select)
+				: CreatePagedQuery(
 					query,
 					unpaginatedQuery,
 					queryMaker.Page),
@@ -40,15 +49,7 @@ namespace QueryMakerLibrary
 				throw Errors.Exception(Errors.IQueryableNull);
 			}
 
-			return CreatePagedQuery(
-				query,
-				CreateSelectedQuery(
-					CreateSortedQuery(
-						CreateFilteredQuery(query,
-							queryMaker.Filter),
-						queryMaker.Sort),
-					queryMaker.Select),
-				queryMaker.Page);
+			return CreateActionsResult(query, queryMaker).PaginatedQuery;
 		}
 
 		#endregion Internal Methods

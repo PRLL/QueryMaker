@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Linq.Expressions;
+using System.Reflection;
 using QueryMakerLibrary.Constants;
 using static QueryMakerLibrary.Components.Filter;
 
@@ -9,9 +10,7 @@ namespace QueryMakerLibrary.Logic
 	{
 		internal static Expression CreateEvaluationExpression(ActionExpression actionExpression, object? value)
 		{
-			bool itemSameTypeAsMember = value is not null && value.GetType().Equals(actionExpression.MemberExpression.Type);
 			bool isContentAction = false;
-			
 			switch (actionExpression.Action)
 			{
 				case FilterActions.Contains: case FilterActions.NotContains:
@@ -21,31 +20,32 @@ namespace QueryMakerLibrary.Logic
 					break;
 			}
 
-			Expression typedMemberExpression = (!itemSameTypeAsMember && !actionExpression.IsMemberExpressionString)
-				|| (isContentAction && !actionExpression.IsMemberExpressionString)
+			bool itemSameTypeAsMember = value is not null && value.GetType().Equals(actionExpression.MemberExpression.Type);
+
+			Expression typedMemberExpression = !actionExpression.IsMemberExpressionString
+				&& (!itemSameTypeAsMember || isContentAction)
 					? Expression.Call(
 						actionExpression.MemberExpression,
 						"ToString",
 						Type.EmptyTypes)
 					: actionExpression.MemberExpression;
 
-			Expression typedValueExpression = Expression.Constant((!itemSameTypeAsMember && (value is not null
-				&& !value.GetType().Equals(typeof(string)))) || (isContentAction
-				&& value is not null && !value.GetType().Equals(typeof(string)))
+			Expression typedValueExpression = Expression.Constant(
+				value is not null && !value.GetType().Equals(typeof(string))
+				&& (!itemSameTypeAsMember || isContentAction)
 					? Convert.ToString(value)
 					: value);
 
+			bool isMemberExpressionStringType = typedMemberExpression.Type == typeof(string);
+
 			if (actionExpression.IgnoreCase)
 			{
-				if (actionExpression.IsMemberExpressionString)
+				if (isMemberExpressionStringType)
 				{
 					typedMemberExpression = Expression.Call(typedMemberExpression,
 						"ToLower",
 						Type.EmptyTypes);
-				}
 
-				if (value is not null && value.GetType().Equals(typeof(string)))
-				{
 					typedValueExpression = Expression.Call(
 						typedValueExpression,
 						"ToLower",
@@ -89,20 +89,45 @@ namespace QueryMakerLibrary.Logic
 					evaluationExpression = Expression.NotEqual(typedMemberExpression, typedValueExpression);
 					break;
 
-				case FilterActions.GreaterThan:
-					evaluationExpression = Expression.GreaterThan(typedMemberExpression, typedValueExpression);
-					break;
+				case FilterActions.GreaterThan: case FilterActions.LessThan:
+				case FilterActions.GreaterThanOrEqual: case FilterActions.LessThanOrEqual:
+					if (typedMemberExpression.Type == typeof(bool))
+					{
+						typedMemberExpression = Expression.Convert(
+							actionExpression.MemberExpression,
+							typeof(int));
 
-				case FilterActions.LessThan:
-					evaluationExpression = Expression.LessThan(typedMemberExpression, typedValueExpression);
-					break;
+						typedValueExpression = Expression.Convert(
+							Expression.Constant(value),
+							typeof(int));
+					}
+					else if (isMemberExpressionStringType)
+					{
+						PropertyInfo stringLengthProperty = typeof(string).GetProperty(nameof(string.Length))
+							?? throw new NullReferenceException($"Property {nameof(string.Length)} does not exist in type {typeof(string).Name}");
 
-				case FilterActions.GreaterThanOrEqual:
-					evaluationExpression = Expression.GreaterThanOrEqual(typedMemberExpression, typedValueExpression);
-					break;
+						typedMemberExpression = Expression.MakeMemberAccess(typedMemberExpression, stringLengthProperty);
+						typedValueExpression = Expression.MakeMemberAccess(typedValueExpression, stringLengthProperty);
+					}
 
-				case FilterActions.LessThanOrEqual:
-					evaluationExpression = Expression.LessThanOrEqual(typedMemberExpression, typedValueExpression);
+					switch (actionExpression.Action)
+					{
+						case FilterActions.GreaterThan:
+							evaluationExpression = Expression.GreaterThan(typedMemberExpression, typedValueExpression);
+							break;
+
+						case FilterActions.LessThan:
+							evaluationExpression = Expression.LessThan(typedMemberExpression, typedValueExpression);
+							break;
+
+						case FilterActions.GreaterThanOrEqual:
+							evaluationExpression = Expression.GreaterThanOrEqual(typedMemberExpression, typedValueExpression);
+							break;
+
+						case FilterActions.LessThanOrEqual:
+							evaluationExpression = Expression.LessThanOrEqual(typedMemberExpression, typedValueExpression);
+							break;
+					}
 					break;
 
 				default:

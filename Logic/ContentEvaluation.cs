@@ -70,17 +70,15 @@ namespace QueryMakerLibrary.Logic
 						null,
 						typedValueExpression);
 
-					switch (actionExpression.Action)
+					evaluationExpression = actionExpression.Action switch
 					{
-						case FilterActions.NotContains:
-						case FilterActions.NotStartsWith:
-						case FilterActions.NotEndsWith:
-							return Expression.Not(evaluationExpression);
+						FilterActions.NotContains or FilterActions.NotStartsWith or FilterActions.NotEndsWith
+							=> Expression.Not(evaluationExpression),
 
-						default:
-							return evaluationExpression;
-					}
+						_ => evaluationExpression,
+					};
 
+					break;
 				case FilterActions.Equal:
 					evaluationExpression = Expression.Equal(typedMemberExpression, typedValueExpression);
 					break;

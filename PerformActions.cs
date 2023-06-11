@@ -19,27 +19,86 @@ namespace QueryMakerLibrary
 
 			IQueryable<T> filteredQuery = CreateFilteredQuery(query, queryMaker.Filter);
 
-			IQueryable<T> unpaginatedQuery =
-				CreateSortedQuery(
-					CreateSelectedQuery(
-						filteredQuery,
-						queryMaker.Select),
-					queryMaker.Sort);
+			if (queryMaker.Select is not null && queryMaker.Select.DistinctBy)
+			{
+				Select select = new(queryMaker.Select.Fields, true);
 
-			return new(queryMaker.Page is not null && !string.IsNullOrWhiteSpace(queryMaker.Page.Index)
-				? CreateSelectedQuery(
-					CreatePagedQuery(
-						query,
+				IQueryable<T> unpaginatedQuery =
+					CreateSortedQuery(
+						CreateSelectedQuery(
+							filteredQuery,
+							select),
+						queryMaker.Sort,
+						select.Fields);
+
+				select.DistinctBy = false;
+
+				if (queryMaker.Page is not null
+					&& !string.IsNullOrWhiteSpace(queryMaker.Page.Index))
+				{
+					if (!select.Fields.Contains(queryMaker.Page.Index))
+					{
+						return new(CreatePagedQuery(
+								query, unpaginatedQuery,
+								new(queryMaker.Page.Skip,
+									queryMaker.Page.Take)),
+							unpaginatedQuery);
+					}
+					else
+					{
+						return new(CreateSelectedQuery(
+							CreateSortedQuery(
+								CreatePagedQuery(
+									query,
+									unpaginatedQuery,
+									queryMaker.Page),
+								queryMaker.Sort,
+								select.Fields),
+							select),
+							unpaginatedQuery);
+					}
+				}
+				else
+				{
+					return new(CreatePagedQuery(
+							query, unpaginatedQuery,
+							queryMaker.Page),
+						unpaginatedQuery);
+				}
+			}
+			else if (queryMaker.Page is not null
+				&& !string.IsNullOrWhiteSpace(queryMaker.Page.Index))
+			{
+				IQueryable<T> sortedQuery = CreateSortedQuery(
+					filteredQuery, queryMaker.Sort);
+
+				return new(CreateSelectedQuery(
+					CreateSortedQuery(
+						CreatePagedQuery(
+							query,
+							sortedQuery,
+							queryMaker.Page),
+						queryMaker.Sort),
+					queryMaker.Select),
+					CreateSelectedQuery(
+						sortedQuery,
+						queryMaker.Select));
+			}
+			else
+			{
+				IQueryable<T> unpaginatedQuery =
+					CreateSelectedQuery(
 						CreateSortedQuery(
 							filteredQuery,
 							queryMaker.Sort),
+						queryMaker.Select);
+
+				return new(CreatePagedQuery(
+						query,
+						unpaginatedQuery,
 						queryMaker.Page),
-					queryMaker.Select)
-				: CreatePagedQuery(
-					query,
-					unpaginatedQuery,
-					queryMaker.Page),
-				unpaginatedQuery);
+					unpaginatedQuery);
+			}
 		}
 
 		internal static IQueryable<T> CreateActionsQuery<T>(IQueryable<T> query, QueryMaker queryMaker)
@@ -72,7 +131,7 @@ namespace QueryMakerLibrary
 		}
 
 		private static IQueryable<T> CreateSortedQuery<T>(IQueryable<T> query, Sort? sort = null,
-			bool isThen = false, IOrderedQueryable<T>? orderedQuery = null)
+			string[]? allowedFields = null, IOrderedQueryable<T>? orderedQuery = null)
 		{
 			if (sort is not null)
 			{
@@ -80,32 +139,35 @@ namespace QueryMakerLibrary
 				{
 					throw Errors.Exception(Errors.SortFieldEmpty);
 				}
+				else if (allowedFields is not null
+					&& allowedFields.Length > 0
+					&& !allowedFields.Contains(sort.Field))
+				{
+					return sort.Then is not null
+						? CreateSortedQuery(query, sort.Then, allowedFields, orderedQuery)
+						: orderedQuery is null ? query : orderedQuery;
+				}
 
 				Expression<Func<T, object>> selectExpression = SelectMethods.CreateSelectExpression<T>(
 						Expression.Parameter(typeof(T), Miscellaneous.INSTANCE),
 						sort.Field);
 
-				switch(sort.Direction)
+				orderedQuery = sort.Direction switch
 				{
-					case SortDirections.Ascending:
-						orderedQuery = isThen && orderedQuery is not null
-								? orderedQuery.ThenBy(selectExpression)
-								: query.OrderBy(selectExpression);
-						break;
+					SortDirections.Ascending => orderedQuery is null
+						? query.OrderBy(selectExpression)
+						: orderedQuery.ThenBy(selectExpression),
 
-					case SortDirections.Descending:
-						orderedQuery = isThen && orderedQuery is not null
-								? orderedQuery.ThenByDescending(selectExpression)
-								: query.OrderByDescending(selectExpression);
-						break;
+					SortDirections.Descending => orderedQuery is null
+						? query.OrderByDescending(selectExpression)
+						: orderedQuery.ThenByDescending(selectExpression),
 
-					default:
-						throw Errors.Exception(Errors.InvalidSortingDirection, sort.Direction, true);
-				}
+					_ => throw Errors.Exception(Errors.InvalidSortingDirection, sort.Direction)
+				};
 
 				if (sort.Then is not null)
 				{
-					return CreateSortedQuery<T>(query, sort.Then, true, orderedQuery);
+					return CreateSortedQuery(query, sort.Then, allowedFields, orderedQuery);
 				}
 
 				return orderedQuery;

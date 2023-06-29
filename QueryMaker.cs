@@ -13,28 +13,28 @@ namespace QueryMakerLibrary
 		#region Constructors
 
 		/// <summary>
-		/// <para>Initializes a new instance of the <see cref="QueryMakerLibrary.QueryMaker" /> class.</para>
+		/// <para>Initializes a new instance of the <see cref="QueryMaker" /> class.</para>
 		/// <para>Set the parameter for operations which want to perform.</para>
 		/// <para>All components default to null.</para>
 		/// <para>NOTE: Any component left as null will not perform it's corresponding action.</para>
 		/// </summary>
 		/// <param name="filter">
-		/// <para>Instance of <see cref="QueryMakerLibrary.Components.Filter" /> used for performing filtering action.</para>
+		/// <para>Instance of <see cref="Components.Filter" /> used for performing filtering action.</para>
 		/// <para>Defaults to null.</para>
 		/// NOTE: If left as null filtering action will not be performed
 		/// </param>
 		/// <param name="sort">
-		/// <para>Instance of <see cref="QueryMakerLibrary.Components.Sort" /> used for performing sorting action.</para>
+		/// <para>Instance of <see cref="Components.Sort" /> used for performing sorting action.</para>
 		/// <para>Defaults to null.</para>
 		/// NOTE: If left as null sorting action will not be performed
 		/// </param>
 		/// <param name="page">
-		/// <para>Instance of <see cref="QueryMakerLibrary.Components.Page" /> used for performing paging action.</para>
+		/// <para>Instance of <see cref="Components.Page" /> used for performing paging action.</para>
 		/// <para>Defaults to null.</para>
 		/// NOTE: If left as null paging action will not be performed
 		/// </param>
 		/// <param name="select">
-		/// <para>Instance of <see cref="QueryMakerLibrary.Components.Select" /> used for performing selecting action.</para>
+		/// <para>Instance of <see cref="Components.Select" /> used for performing selecting action.</para>
 		/// <para>Defaults to null.</para>
 		/// NOTE: If left as null selecting action will not be performed
 		/// </param>
@@ -51,34 +51,26 @@ namespace QueryMakerLibrary
 		#region Private Fields
 
 		private Sort? _sort = null;
-		private Sort? _deepestSort = null;
 
 		#endregion Private Fields
 
 		#region Private Properties
 
-		private Sort? DeepestSort
-		{
-			get => _deepestSort;
-			set
-			{
-				_deepestSort = value;
-			}
-		}
+		private Sort? DeepestSort { get; set; } = null;
 
 		#endregion Private Properties
 
 		#region Public Properties
 
 		/// <summary>
-		/// <para>Property of type <see cref="QueryMakerLibrary.Components.Filter" /> used for performing filtering.</para>
+		/// <para>Property of type <see cref="Components.Filter" /> used for performing filtering.</para>
 		/// <para>Defaults to null.</para>
 		/// NOTE: If left as null filtering will not be performed
 		/// </summary>
 		public Filter? Filter { get; set; } = null;
 
 		/// <summary>
-		/// <para>Property of type <see cref="QueryMakerLibrary.Components.Sort" /> used for performing sorting.</para>
+		/// <para>Property of type <see cref="Components.Sort" /> used for performing sorting.</para>
 		/// <para>Defaults to null.</para>
 		/// NOTE: If left as null sorting will not be performed
 		/// </summary>
@@ -93,14 +85,14 @@ namespace QueryMakerLibrary
 		}
 
 		/// <summary>
-		/// <para>Property of type <see cref="QueryMakerLibrary.Components.Sort" /> used for performing paging.</para>
+		/// <para>Property of type <see cref="Components.Sort" /> used for performing paging.</para>
 		/// <para>Defaults to null.</para>
 		/// NOTE: If left as null paging will not be performed
 		/// </summary>
 		public Page? Page { get; set; } = null;
 
 		/// <summary>
-		/// <para>Property of type <see cref="QueryMakerLibrary.Components.Sort" /> used for performing selecting.</para>
+		/// <para>Property of type <see cref="Components.Sort" /> used for performing selecting.</para>
 		/// <para>Defaults to null.</para>
 		/// NOTE: If left as null selecting will not be performed
 		/// </summary>
@@ -114,13 +106,13 @@ namespace QueryMakerLibrary
 		/// Adds expressions to <paramref name="query" /> using properties from this instance.
 		/// </summary>
 		/// <returns>
-		/// Instance of <see cref="QueryMakerLibrary.QueryMakerResult{T}" /> with resulting query and count of unpaginated results.
+		/// Instance of <see cref="QueryMakerResult{T}" /> with resulting paginated and unpaginated queries.
 		/// </returns>
 		/// <param name="query">
-		/// <para>Instance of <see cref="System.Linq.IQueryable{T}" /> to add expressions</para>
+		/// <para>Instance of <see cref="IQueryable{T}" /> to add expressions</para>
 		/// NOTE: If set null will throw exception
 		/// </param>
-		/// <exception cref="System.Exception" />
+		/// <exception cref="Exception" />
 		public QueryMakerResult<T> MakeQueryResult<T>(IQueryable<T> query)
 		{
 			try
@@ -137,98 +129,81 @@ namespace QueryMakerLibrary
 		/// Adds expressions to <paramref name="query" /> using properties from this instance
 		/// </summary>
 		/// <returns>
-		/// Resulting <see cref="System.Linq.IQueryable{T}" /> with performed components actions.
+		/// Resulting <see cref="IQueryable{T}" /> with performed components actions.
 		/// </returns>
 		/// <param name="query">
-		/// <para>Instance of <see cref="System.Linq.IQueryable{T}" /> to add expressions</para>
+		/// <para>Instance of <see cref="IQueryable{T}" /> to add expressions</para>
 		/// NOTE: If set null will throw exception
 		/// </param>
-		/// <exception cref="System.Exception" />
+		/// <exception cref="Exception" />
 		public IQueryable<T> MakeQuery<T>(IQueryable<T> query)
-		{
-			try
-			{
-				return PerformActions.CreateActionsQuery(query, this);
-			}
-			catch (Exception exception)
-			{
-				throw Errors.Exception(Errors.ErrorMessage, exception.Message);
-			}
-		}
+			=> MakeQueryResult(query).PaginatedQuery;
 
 		/// <summary>
-		/// Performs filtering on <paramref name="query" /> using <see cref="QueryMakerLibrary.QueryMaker.Filter" /> property from this instance.
+		/// <para>Shortcut method which only performs filtering on <paramref name="query" /> using <see cref="Filter" /> property from this instance.</para>
+		/// <para>For perming all operations, use <see cref="MakeQuery" /> or <see cref="MakeQueryResult" />.</para>
 		/// </summary>
 		/// <returns>
-		/// An <see cref="System.Linq.IQueryable{T}" /> with added filter actions.
+		/// An <see cref="IQueryable{T}" /> with added filter actions.
 		/// </returns>
 		/// <param name="query">
-		/// <para>Instance of <see cref="System.Linq.IQueryable{T}" /> to add filtering</para>
+		/// <para>Instance of <see cref="IQueryable{T}" /> to add filtering</para>
 		/// NOTE: If set null will throw exception
 		/// </param>
-		/// <exception cref="System.Exception" />
+		/// <exception cref="Exception" />
 		public IQueryable<T> Filtering<T>(IQueryable<T> query)
-		{
-			return PerformActions.CreateActionsQuery(query,
-				new QueryMaker(filter: this.Filter));
-		}
+			=> new QueryMaker(filter: Filter).MakeQuery(query);
 
 		/// <summary>
-		/// Performs sorting on <paramref name="query" /> using <see cref="QueryMakerLibrary.QueryMaker.Sort" /> property from this instance.
+		/// <para>Shortcut method which only performs sorting on <paramref name="query" /> using <see cref="Sort" /> property from this instance.</para>
+		/// <para>For perming all operations, use <see cref="MakeQuery" /> or <see cref="MakeQueryResult" />.</para>
 		/// </summary>
 		/// <returns>
-		/// An <see cref="System.Linq.IQueryable{T}" /> with added sorting actions.
+		/// An <see cref="IQueryable{T}" /> with added sorting actions.
 		/// </returns>
 		/// <param name="query">
-		/// <para>Instance of <see cref="System.Linq.IQueryable{T}" /> to add sorting</para>
+		/// <para>Instance of <see cref="IQueryable{T}" /> to add sorting</para>
 		/// NOTE: If set null will throw exception
 		/// </param>
-		/// <exception cref="System.Exception" />
+		/// <exception cref="Exception" />
 		public IQueryable<T> Sorting<T>(IQueryable<T> query)
-		{
-			return PerformActions.CreateActionsQuery(query,
-				new QueryMaker(sort: this.Sort));
-		}
+			=> new QueryMaker(sort: Sort).MakeQuery(query);
 
 		/// <summary>
-		/// Performs paging actions on <paramref name="query" /> using <see cref="QueryMakerLibrary.QueryMaker.Page" /> property from this instance.
+		/// <para>Shortcut method which only performs paging on <paramref name="query" /> using <see cref="Page" /> property from this instance.</para>
+		/// <para>For perming all operations, use <see cref="MakeQuery" /> or <see cref="MakeQueryResult" />.</para>
 		/// </summary>
 		/// <returns>
-		/// An <see cref="System.Linq.IQueryable{T}" /> with added paging actions.
+		/// An <see cref="IQueryable{T}" /> with added paging actions.
 		/// </returns>
 		/// <param name="query">
-		/// <para>Instance of <see cref="System.Linq.IQueryable{T}" /> to add paging</para>
+		/// <para>Instance of <see cref="IQueryable{T}" /> to add paging</para>
 		/// NOTE: If set null will throw exception
 		/// </param>
-		/// <exception cref="System.Exception" />
+		/// <exception cref="Exception" />
 		public IQueryable<T> Paging<T>(IQueryable<T> query)
-		{
-			return PerformActions.CreateActionsQuery(query,
-				new QueryMaker(page: this.Page));
-		}
+			=> new QueryMaker(page: Page).MakeQuery(query);
 
 		/// <summary>
-		/// Performs selecting on <paramref name="query" /> using <see cref="QueryMakerLibrary.QueryMaker.Select" />  property from this instance.
+		/// <para>Shortcut method which only performs selecting on <paramref name="query" /> using <see cref="Select" />  property from this instance.</para>
+		/// <para>For perming all operations, use <see cref="MakeQuery" /> or <see cref="MakeQueryResult" />.</para>
 		/// </summary>
 		/// <returns>
-		/// An <see cref="System.Linq.IQueryable{T}" /> with added select actions.
+		/// An <see cref="IQueryable{T}" /> with added select actions.
 		/// </returns>
 		/// <param name="query">
-		/// <para>Instance of <see cref="System.Linq.IQueryable{T}" /> to add selecting</para>
+		/// <para>Instance of <see cref="IQueryable{T}" /> to add selecting</para>
 		/// NOTE: If set null will throw exception
 		/// </param>
-		/// <exception cref="System.Exception" />
+		/// <exception cref="Exception" />
 		public IQueryable<T> Selecting<T>(IQueryable<T> query)
-		{
-			return PerformActions.CreateActionsQuery(query,
-				new QueryMaker(select: this.Select));
-		}
+			=> new QueryMaker(select: Select).MakeQuery(query);
 
 		/// <summary>
-		/// Add <see cref="QueryMakerLibrary.QueryMaker.Filter" /> component to this instance
+		/// Add <see cref="Filter" /> component to this instance
 		/// </summary>
 		/// <param name="filter">
-		/// <para>Instance of <see cref="QueryMakerLibrary.Components.Filter" /> to add.</para>
+		/// <para>Instance of <see cref="Components.Filter" /> to add.</para>
 		/// </param>
 		/// <returns>
 		/// This instance of <see cref="QueryMaker" /> with added <see cref="Filter" /> component.
@@ -240,7 +215,7 @@ namespace QueryMakerLibrary
 		}
 
 		/// <summary>
-		/// Add <see cref="QueryMakerLibrary.QueryMaker.Filter" /> component to this instance.
+		/// Add <see cref="Filter" /> component to this instance.
 		/// </summary>
 		/// <param name="field">
 		/// <para>Field to perform filtering on.</para>
@@ -248,8 +223,8 @@ namespace QueryMakerLibrary
 		/// </param>
 		/// <param name="action">
 		/// <para>Action to perform.</para>
-		/// <para>Refer to <see cref="QueryMakerLibrary.Components.Filter.FilterActions" /> for possible values.</para>
-		/// <para>NOTE: If not set to a valid <see cref="QueryMakerLibrary.Components.Filter.FilterActions" /> value, will throw exception when performing filtering.</para>
+		/// <para>Refer to <see cref="FilterActions" /> for possible values.</para>
+		/// <para>NOTE: If not set to a valid <see cref="FilterActions" /> value, will throw exception when performing filtering.</para>
 		/// </param>
 		/// <param name="value">
 		/// <para>Value to filter by.</para>
@@ -272,7 +247,7 @@ namespace QueryMakerLibrary
 		}
 		
 		/// <summary>
-		/// Add <see cref="QueryMakerLibrary.QueryMaker.Filter" /> component to this instance with required parameters for performing filtering using multiple fields.
+		/// Add <see cref="Filter" /> component to this instance with required parameters for performing filtering using multiple fields.
 		/// </summary>
 		/// <param name="fields">
 		/// <para>Array of fields to perform filtering on.</para>
@@ -280,17 +255,17 @@ namespace QueryMakerLibrary
 		/// </param>
 		/// <param name="action">
 		/// <para>Action to perform.</para>
-		/// <para>Refer to <see cref="QueryMakerLibrary.Components.Filter.FilterActions" /> for possible values.</para>
-		/// <para>NOTE: If not set to a valid <see cref="QueryMakerLibrary.Components.Filter.FilterActions" /> value, will throw exception when performing filtering.</para>
+		/// <para>Refer to <see cref="FilterActions" /> for possible values.</para>
+		/// <para>NOTE: If not set to a valid <see cref="FilterActions" /> value, will throw exception when performing filtering.</para>
 		/// </param>
 		/// <param name="value">
 		/// <para>Value to filter by.</para>
 		/// </param>
 		/// <param name="fieldsOperation">
 		/// <para>Operation to perform between <paramref name="fields" />.</para>
-		/// <para>Refer to <see cref="QueryMakerLibrary.Components.Filter.FilterOperations" /> for possible values</para>
-		/// <para>Defaults to <see cref="QueryMakerLibrary.Components.Filter.FilterOperations.OrElse" />.</para>
-		/// <para>NOTE: If not set to a valid <see cref="QueryMakerLibrary.Components.Filter.FilterOperations" /> value, then will throw exception when performing filtering.</para>
+		/// <para>Refer to <see cref="FilterOperations" /> for possible values</para>
+		/// <para>Defaults to <see cref="FilterOperations.OrElse" />.</para>
+		/// <para>NOTE: If not set to a valid <see cref="FilterOperations" /> value, then will throw exception when performing filtering.</para>
 		/// </param>
 		/// <param name="ignoreCase">
 		/// <para>Set true to ignore case sensitivity on evaluation performed on filtering.</para>
@@ -310,17 +285,17 @@ namespace QueryMakerLibrary
 		}
 
 		/// <summary>
-		/// <para>Add <see cref="QueryMakerLibrary.QueryMaker.Filter" /> component to this instance as a joiner with subfilters to join.</para>
-		/// <para><see cref="QueryMakerLibrary.Components.Filter.IsJoiner" /> will be set to true by default</para>
+		/// <para>Add <see cref="Filter" /> component to this instance as a joiner with subfilters to join.</para>
+		/// <para><see cref="Filter.IsJoiner" /> will be set to true by default</para>
 		/// </summary>
 		/// <param name="subFiltersOperation">
 		/// <para>Operation to perform between passed <paramref name="subFilters" />.</para>
-		/// <para>Refer to <see cref="QueryMakerLibrary.Components.Filter.FilterOperations" /> for possible values</para>
-		/// <para>NOTE: If not set to a valid <see cref="QueryMakerLibrary.Components.Filter.FilterOperations" /> value and <see cref="QueryMakerLibrary.Components.Filter.SubFilters" /> property has items, then will throw exception when joining subfilters.</para>
+		/// <para>Refer to <see cref="FilterOperations" /> for possible values</para>
+		/// <para>NOTE: If not set to a valid <see cref="FilterOperations" /> value and <see cref="Filter.SubFilters" /> property has items, then will throw exception when joining subfilters.</para>
 		/// </param>
 		/// <param name="subFilters">
-		/// <para>Array of <see cref="QueryMakerLibrary.Components.Filter" /> instances to be joined</para>
-		/// NOTE: If this property has items and <see cref="QueryMakerLibrary.Components.Filter.SubFiltersOperation" /> property is not set to a valid value, then will throw exception
+		/// <para>Array of <see cref="Components.Filter" /> instances to be joined</para>
+		/// NOTE: If this property has items and <see cref="Filter.SubFiltersOperation" /> property is not set to a valid value, then will throw exception
 		/// </param>
 		/// <returns>
 		/// This instance of <see cref="QueryMaker" /> added <paramref name="subFilters" /> on <see cref="Filter" /> component.
@@ -334,7 +309,7 @@ namespace QueryMakerLibrary
 		/// <para>Add subfilters to be performed after <see cref="Filter" /> with AndAlso evaluation.</para>
 		/// </summary>
 		/// <param name="subFilters">
-		/// <para>Array of <see cref="QueryMakerLibrary.Components.Filter" /> instances to be joined</para>
+		/// <para>Array of <see cref="Components.Filter" /> instances to be joined</para>
 		/// </param>
 		/// <returns>
 		/// This instance of <see cref="QueryMaker" /> with added <paramref name="subFilters" /> on <see cref="Filter" /> component.
@@ -358,8 +333,8 @@ namespace QueryMakerLibrary
 		/// </param>
 		/// <param name="action">
 		/// <para>Action to perform.</para>
-		/// <para>Refer to <see cref="QueryMakerLibrary.Components.Filter.FilterActions" /> for possible values.</para>
-		/// <para>NOTE: If not set to a valid <see cref="QueryMakerLibrary.Components.Filter.FilterActions" /> value, will throw exception when performing filtering.</para>
+		/// <para>Refer to <see cref="FilterActions" /> for possible values.</para>
+		/// <para>NOTE: If not set to a valid <see cref="FilterActions" /> value, will throw exception when performing filtering.</para>
 		/// </param>
 		/// <param name="value">
 		/// <para>Value to filter by.</para>
@@ -390,17 +365,17 @@ namespace QueryMakerLibrary
 		/// </param>
 		/// <param name="action">
 		/// <para>Action to perform.</para>
-		/// <para>Refer to <see cref="QueryMakerLibrary.Components.Filter.FilterActions" /> for possible values.</para>
-		/// <para>NOTE: If not set to a valid <see cref="QueryMakerLibrary.Components.Filter.FilterActions" /> value, will throw exception when performing filtering.</para>
+		/// <para>Refer to <see cref="FilterActions" /> for possible values.</para>
+		/// <para>NOTE: If not set to a valid <see cref="FilterActions" /> value, will throw exception when performing filtering.</para>
 		/// </param>
 		/// <param name="value">
 		/// <para>Value to filter by.</para>
 		/// </param>
 		/// <param name="fieldsOperation">
 		/// <para>Operation to perform between <paramref name="fields" />.</para>
-		/// <para>Refer to <see cref="QueryMakerLibrary.Components.Filter.FilterOperations" /> for possible values</para>
-		/// <para>Defaults to <see cref="QueryMakerLibrary.Components.Filter.FilterOperations.OrElse" />.</para>
-		/// <para>NOTE: If not set to a valid <see cref="QueryMakerLibrary.Components.Filter.FilterOperations" /> value, then will throw exception when performing filtering.</para>
+		/// <para>Refer to <see cref="FilterOperations" /> for possible values</para>
+		/// <para>Defaults to <see cref="FilterOperations.OrElse" />.</para>
+		/// <para>NOTE: If not set to a valid <see cref="FilterOperations" /> value, then will throw exception when performing filtering.</para>
 		/// </param>
 		/// <param name="ignoreCase">
 		/// <para>Set true to ignore case sensitivity on evaluation performed on filtering.</para>
@@ -423,7 +398,7 @@ namespace QueryMakerLibrary
 		/// <para>Add subfilters to be performed after <see cref="Filter" /> with OrElse evaluation.</para>
 		/// </summary>
 		/// <param name="subFilters">
-		/// <para>Array of <see cref="QueryMakerLibrary.Components.Filter" /> instances to be joined</para>
+		/// <para>Array of <see cref="Components.Filter" /> instances to be joined</para>
 		/// </param>
 		/// <returns>
 		/// This instance of <see cref="QueryMaker" /> with added <paramref name="subFilters" /> on <see cref="Filter" /> component.
@@ -447,8 +422,8 @@ namespace QueryMakerLibrary
 		/// </param>
 		/// <param name="action">
 		/// <para>Action to perform.</para>
-		/// <para>Refer to <see cref="QueryMakerLibrary.Components.Filter.FilterActions" /> for possible values.</para>
-		/// <para>NOTE: If not set to a valid <see cref="QueryMakerLibrary.Components.Filter.FilterActions" /> value, will throw exception when performing filtering.</para>
+		/// <para>Refer to <see cref="FilterActions" /> for possible values.</para>
+		/// <para>NOTE: If not set to a valid <see cref="FilterActions" /> value, will throw exception when performing filtering.</para>
 		/// </param>
 		/// <param name="value">
 		/// <para>Value to filter by.</para>
@@ -479,17 +454,17 @@ namespace QueryMakerLibrary
 		/// </param>
 		/// <param name="action">
 		/// <para>Action to perform.</para>
-		/// <para>Refer to <see cref="QueryMakerLibrary.Components.Filter.FilterActions" /> for possible values.</para>
-		/// <para>NOTE: If not set to a valid <see cref="QueryMakerLibrary.Components.Filter.FilterActions" /> value, will throw exception when performing filtering.</para>
+		/// <para>Refer to <see cref="FilterActions" /> for possible values.</para>
+		/// <para>NOTE: If not set to a valid <see cref="FilterActions" /> value, will throw exception when performing filtering.</para>
 		/// </param>
 		/// <param name="value">
 		/// <para>Value to filter by.</para>
 		/// </param>
 		/// <param name="fieldsOperation">
 		/// <para>Operation to perform between <paramref name="fields" />.</para>
-		/// <para>Refer to <see cref="QueryMakerLibrary.Components.Filter.FilterOperations" /> for possible values</para>
-		/// <para>Defaults to <see cref="QueryMakerLibrary.Components.Filter.FilterOperations.OrElse" />.</para>
-		/// <para>NOTE: If not set to a valid <see cref="QueryMakerLibrary.Components.Filter.FilterOperations" /> value, then will throw exception when performing filtering.</para>
+		/// <para>Refer to <see cref="FilterOperations" /> for possible values</para>
+		/// <para>Defaults to <see cref="FilterOperations.OrElse" />.</para>
+		/// <para>NOTE: If not set to a valid <see cref="FilterOperations" /> value, then will throw exception when performing filtering.</para>
 		/// </param>
 		/// <param name="ignoreCase">
 		/// <para>Set true to ignore case sensitivity on evaluation performed on filtering.</para>
@@ -509,10 +484,10 @@ namespace QueryMakerLibrary
 		}
 
 		/// <summary>
-		/// Add <see cref="QueryMakerLibrary.QueryMaker.Sort" /> component to this instance
+		/// Add <see cref="Sort" /> component to this instance
 		/// </summary>
 		/// <param name="sort">
-		/// <para>Instance of <see cref="QueryMakerLibrary.Components.Sort" /> to add.</para>
+		/// <para>Instance of <see cref="Components.Sort" /> to add.</para>
 		/// </param>
 		/// <returns>
 		/// This instance of <see cref="QueryMaker" /> with added <see cref="Sort" /> component.
@@ -524,7 +499,7 @@ namespace QueryMakerLibrary
 		}
 
 		/// <summary>
-		/// Add <see cref="QueryMakerLibrary.QueryMaker.Sort" /> component to this instance
+		/// Add <see cref="Sort" /> component to this instance
 		/// </summary>
 		/// <param name="field">
 		/// <para>Field to sort by.</para>
@@ -533,8 +508,8 @@ namespace QueryMakerLibrary
 		/// </param>
 		/// <param name="direction">
 		/// <para>Sorting direction.</para>
-		/// <para>Refer to <see cref="QueryMakerLibrary.Components.Sort.SortDirections" /> for possible values</para>
-		/// <para>Defaults to <see cref="QueryMakerLibrary.Components.Sort.SortDirections.Ascending" />.</para>
+		/// <para>Refer to <see cref="SortDirections" /> for possible values</para>
+		/// <para>Defaults to <see cref="SortDirections.Ascending" />.</para>
 		/// <para>NOTE: If not a valid direction, then will throw exception.</para>
 		/// </param>
 		/// <param name="then">
@@ -582,8 +557,8 @@ namespace QueryMakerLibrary
 		/// </param>
 		/// <param name="direction">
 		/// <para>Sorting direction.</para>
-		/// <para>Refer to <see cref="QueryMakerLibrary.Components.Sort.SortDirections" /> for possible values</para>
-		/// <para>Defaults to <see cref="QueryMakerLibrary.Components.Sort.SortDirections.Ascending" />.</para>
+		/// <para>Refer to <see cref="SortDirections" /> for possible values</para>
+		/// <para>Defaults to <see cref="SortDirections.Ascending" />.</para>
 		/// <para>NOTE: If not a valid direction, then will throw exception.</para>
 		/// </param>
 		/// <param name="then">
@@ -608,10 +583,10 @@ namespace QueryMakerLibrary
 		}
 
 		/// <summary>
-		/// Add <see cref="QueryMakerLibrary.QueryMaker.Page" /> component to this instance
+		/// Add <see cref="Page" /> component to this instance
 		/// </summary>
 		/// <param name="page">
-		/// <para>Instance of <see cref="QueryMakerLibrary.Components.Page" /> to add.</para>
+		/// <para>Instance of <see cref="Components.Page" /> to add.</para>
 		/// </param>
 		/// <returns>
 		/// This instance of <see cref="QueryMaker" /> with added <see cref="Page" /> component.
@@ -623,7 +598,7 @@ namespace QueryMakerLibrary
 		}
 
 		/// <summary>
-		/// Add <see cref="QueryMakerLibrary.QueryMaker.Page" /> component to this instance
+		/// Add <see cref="Page" /> component to this instance
 		/// </summary>
 		/// <param name="skip">
 		/// <para>Quantity of elements to skip on paging action.</para>
@@ -649,10 +624,10 @@ namespace QueryMakerLibrary
 		}
 
 		/// <summary>
-		/// Add <see cref="QueryMakerLibrary.QueryMaker.Select" /> component to this instance
+		/// Add <see cref="Select" /> component to this instance
 		/// </summary>
 		/// <param name="select">
-		/// <para>Instance of <see cref="QueryMakerLibrary.Components.Select" /> to add.</para>
+		/// <para>Instance of <see cref="Components.Select" /> to add.</para>
 		/// </param>
 		public QueryMaker WithSelect(Select select)
 		{
@@ -661,7 +636,7 @@ namespace QueryMakerLibrary
 		}
 
 		/// <summary>
-		/// Add <see cref="QueryMakerLibrary.QueryMaker.Select" /> component to this instance
+		/// Add <see cref="Select" /> component to this instance
 		/// </summary>
 		/// <param name="fields">
 		/// <para>Fields to select on query.</para>
@@ -675,7 +650,7 @@ namespace QueryMakerLibrary
 		}
 
 		/// <summary>
-		/// Add <see cref="QueryMakerLibrary.QueryMaker.Select" /> component to this instance with distinct by operation.
+		/// Add <see cref="Select" /> component to this instance with distinct by operation.
 		/// <para>Note: If <paramref name="fields" /> is left empty then will return query as is.</para>
 		/// </summary>
 		/// <param name="fields">
@@ -697,17 +672,17 @@ namespace QueryMakerLibrary
 		/// Adds expressions to <paramref name="query" /> using properties from <paramref name="queryMaker" /> instance.
 		/// </summary>
 		/// <returns>
-		/// Instance of <see cref="QueryMakerLibrary.QueryMakerResult{T}" /> with resulting query and count of unpaginated results.
+		/// Instance of <see cref="QueryMakerResult{T}" /> with resulting paginated and unpaginated queries.
 		/// </returns>
 		/// <param name="query">
-		/// <para>Instance of <see cref="System.Linq.IQueryable{T}" /> to add expressions</para>
+		/// <para>Instance of <see cref="IQueryable{T}" /> to add expressions</para>
 		/// NOTE: If set null will throw exception
 		/// </param>
 		/// <param name="queryMaker">
 		/// Instance of QueryMaker class with components of actions to perform
 		/// <para>NOTE: If set null then will perform no actions and return  and return <paramref name="query" /> as is.</para>
 		/// </param>
-		/// <exception cref="System.Exception" />
+		/// <exception cref="Exception" />
 		public static QueryMakerResult<T> MakeQueryResult<T>(IQueryable<T> query, QueryMaker queryMaker)
 		{
 			try
@@ -724,108 +699,95 @@ namespace QueryMakerLibrary
 		/// Adds expressions to <paramref name="query" /> using properties from <paramref name="queryMaker" /> instance
 		/// </summary>
 		/// <returns>
-		/// An <see cref="System.Linq.IQueryable{T}" /> with performed <paramref name="queryMaker" /> components actions.
+		/// An <see cref="IQueryable{T}" /> with performed <paramref name="queryMaker" /> components actions.
 		/// </returns>
 		/// <param name="query">
-		/// <para>The current instance of <see cref="System.Linq.IQueryable{T}" /></para>
+		/// <para>The current instance of <see cref="IQueryable{T}" /></para>
 		/// NOTE: If set null will throw exception
 		/// </param>
 		/// <param name="queryMaker">
 		/// Instance of QueryMaker class with components of actions to perform
 		/// <para>NOTE: If set null then will perform no actions and return  and return <paramref name="query" /> as is.</para>
 		/// </param>
-		/// <exception cref="System.Exception" />
+		/// <exception cref="Exception" />
 		public static IQueryable<T> MakeQuery<T>(IQueryable<T> query, QueryMaker queryMaker)
-		{
-			try
-			{
-				return queryMaker.MakeQuery(query);
-			}
-			catch (Exception exception)
-			{
-				throw Errors.Exception(Errors.ErrorMessage, exception.Message);
-			}
-		}
+			=> queryMaker.MakeQuery(query);
 
 		/// <summary>
-		/// Performs filtering on <paramref name="query" /> using <paramref name="filter" /> instance.
+		/// <para>Shortcut method which only performs filtering on <paramref name="query" /> using <paramref name="filter" />.</para>
+		/// <para>For perming all operations, use <see cref="MakeQuery" /> or <see cref="MakeQueryResult" />.</para>
 		/// </summary>
 		/// <returns>
-		/// An <see cref="System.Linq.IQueryable{T}" /> with added filter actions.
+		/// An <see cref="IQueryable{T}" /> with added filter actions.
 		/// </returns>
 		/// <param name="query">
-		/// <para>The current instance of <see cref="System.Linq.IQueryable{T}" /></para>
+		/// <para>The current instance of <see cref="IQueryable{T}" /></para>
 		/// NOTE: If set null will throw exception
 		/// </param>
 		/// <param name="filter">
-		/// The instance of Filter
+		/// The instance of <see cref= "Components.Filter" /> component to use for applying the filter on <paramref name="query" />.
 		/// <para>NOTE: If set null then will not perform filtering and return <paramref name="query" /> as is.</para>
 		/// </param>
-		/// <exception cref="System.Exception" />
+		/// <exception cref="Exception" />
 		public static IQueryable<T> Filtering<T>(IQueryable<T> query, Filter filter)
-		{
-			return new QueryMaker(filter: filter).MakeQuery(query);
-		}
+			=> new QueryMaker(filter: filter).MakeQuery(query);
 
 		/// <summary>
-		/// Performs sorting on <paramref name="query" /> using <paramref name="sort" /> instance.
+		/// <para>Shortcut method which only performs sorting on <paramref name="query" /> using <paramref name="sort" /> instance.</para>
+		/// <para>For perming all operations, use <see cref="MakeQuery" /> or <see cref="MakeQueryResult" />.</para>
 		/// </summary>
 		/// <returns>
-		/// An <see cref="System.Linq.IQueryable{T}" /> with added sorting actions.
+		/// An <see cref="IQueryable{T}" /> with added sorting actions.
 		/// </returns>
 		/// <param name="query">
-		/// <para>The current instance of <see cref="System.Linq.IQueryable{T}" /></para>
+		/// <para>The current instance of <see cref="IQueryable{T}" /></para>
 		/// NOTE: If set null will throw exception
 		/// </param>
 		/// <param name="sort">
-		/// The instance of Sort
+		/// The instance of <see cref= "Components.Sort" /> component to use for applying the sort on <paramref name="query" />.
 		/// <para>NOTE: If set null then will not perform sorting and return <paramref name="query" /> as is.</para>
 		/// </param>
-		/// <exception cref="System.Exception" />
+		/// <exception cref="Exception" />
 		public static IQueryable<T> Sorting<T>(IQueryable<T> query, Sort sort)
-		{
-			return new QueryMaker(sort: sort).MakeQuery(query);
-		}
+			=> new QueryMaker(sort: sort).MakeQuery(query);
 
 		/// <summary>
-		/// Performs paging actions on <paramref name="query" /> using <paramref name="page" /> instance.
+		/// <para>Shortcut method which only performs paging actions on <paramref name="query" /> using <paramref name="page" /> instance.</para>
+		/// <para>For perming all operations, use <see cref="MakeQuery" /> or <see cref="MakeQueryResult" />.</para>
 		/// </summary>
 		/// <returns>
-		/// An <see cref="System.Linq.IQueryable{T}" /> with added paging actions.
+		/// An <see cref="IQueryable{T}" /> with added paging actions.
 		/// </returns>
 		/// <param name="query">
-		/// <para>Instance of <see cref="System.Linq.IQueryable{T}" /> to add paging</para>
+		/// <para>Instance of <see cref="IQueryable{T}" /> to add paging</para>
 		/// NOTE: If set null will throw exception
 		/// </param>
 		/// <param name="page">
-		/// The instance of Page
+		/// The instance of <see cref= "Components.Page" /> component to use for applying the page on <paramref name="query" />.
 		/// <para>NOTE: If set null then will not perform paging and return <paramref name="query" /> as is.</para>
 		/// </param>
-		/// <exception cref="System.Exception" />
+		/// <exception cref="Exception" />
 		public static IEnumerable<T> Paging<T>(IQueryable<T> query, Page page)
-		{
-			return new QueryMaker(page: page).MakeQuery(query);
-		}
+			=> new QueryMaker(page: page).MakeQuery(query);
 
 		/// <summary>
-		/// Performs selecting on <paramref name="query" /> using <paramref name="select" /> instance.
+		/// <para>Shortcut method which only performs selecting on <paramref name="query" /> using <paramref name="select" /> instance.</para>
+		/// <para>For perming all operations, use <see cref="MakeQuery" /> or <see cref="MakeQueryResult" />.</para>
 		/// </summary>
 		/// <returns>
-		/// An <see cref="System.Linq.IQueryable{T}" /> with added select actions.
+		/// An <see cref="IQueryable{T}" /> with added select actions.
 		/// </returns>
 		/// <param name="query">
-		/// <para>The current instance of <see cref="System.Linq.IQueryable{T}" /></para>
+		/// <para>The current instance of <see cref="IQueryable{T}" /></para>
 		/// NOTE: If set null will throw exception
 		/// </param>
 		/// <param name="select">
-		/// The instance of Select
+		/// The instance of <see cref= "Components.Select" /> component to use for applying the page on <paramref name="query" />.
 		/// <para>NOTE: If set null then will not perform selecting and return <paramref name="query" /> as is.</para>
 		/// </param>
-		/// <exception cref="System.Exception" />
+		/// <exception cref="Exception" />
 		public static IQueryable<T> Selecting<T>(IQueryable<T> query, Select select)
-		{
-			return new QueryMaker(select: select).MakeQuery(query);
-		}
+			=> new QueryMaker(select: select).MakeQuery(query);
 
 		#endregion Public Static Methods
 	}

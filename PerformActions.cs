@@ -101,16 +101,6 @@ namespace QueryMakerLibrary
 			}
 		}
 
-		internal static IQueryable<T> CreateActionsQuery<T>(IQueryable<T> query, QueryMaker queryMaker)
-		{
-			if (query is null)
-			{
-				throw Errors.Exception(Errors.IQueryableNull);
-			}
-
-			return CreateActionsResult(query, queryMaker).PaginatedQuery;
-		}
-
 		#endregion Internal Methods
 
 		#region Private Methods

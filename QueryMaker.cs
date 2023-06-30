@@ -141,7 +141,7 @@ namespace QueryMakerLibrary
 
 		/// <summary>
 		/// <para>Shortcut method which only performs filtering on <paramref name="query" /> using <see cref="Filter" /> property from this instance.</para>
-		/// <para>For perming all operations, use <see cref="MakeQuery" /> or <see cref="MakeQueryResult" />.</para>
+		/// <para>For perming all operations, use <see cref="MakeQuery{T}(IQueryable{T})" /> or <see cref="MakeQueryResult{T}(IQueryable{T})" />.</para>
 		/// </summary>
 		/// <returns>
 		/// An <see cref="IQueryable{T}" /> with added filter actions.
@@ -156,7 +156,7 @@ namespace QueryMakerLibrary
 
 		/// <summary>
 		/// <para>Shortcut method which only performs sorting on <paramref name="query" /> using <see cref="Sort" /> property from this instance.</para>
-		/// <para>For perming all operations, use <see cref="MakeQuery" /> or <see cref="MakeQueryResult" />.</para>
+		/// <para>For perming all operations, use <see cref="MakeQuery{T}(IQueryable{T})" /> or <see cref="MakeQueryResult{T}(IQueryable{T})" />.</para>
 		/// </summary>
 		/// <returns>
 		/// An <see cref="IQueryable{T}" /> with added sorting actions.
@@ -171,7 +171,7 @@ namespace QueryMakerLibrary
 
 		/// <summary>
 		/// <para>Shortcut method which only performs paging on <paramref name="query" /> using <see cref="Page" /> property from this instance.</para>
-		/// <para>For perming all operations, use <see cref="MakeQuery" /> or <see cref="MakeQueryResult" />.</para>
+		/// <para>For perming all operations, use <see cref="MakeQuery{T}(IQueryable{T})" /> or <see cref="MakeQueryResult{T}(IQueryable{T})" />.</para>
 		/// </summary>
 		/// <returns>
 		/// An <see cref="IQueryable{T}" /> with added paging actions.
@@ -186,7 +186,7 @@ namespace QueryMakerLibrary
 
 		/// <summary>
 		/// <para>Shortcut method which only performs selecting on <paramref name="query" /> using <see cref="Select" />  property from this instance.</para>
-		/// <para>For perming all operations, use <see cref="MakeQuery" /> or <see cref="MakeQueryResult" />.</para>
+		/// <para>For perming all operations, use <see cref="MakeQuery{T}(IQueryable{T})" /> or <see cref="MakeQueryResult{T}(IQueryable{T})" />.</para>
 		/// </summary>
 		/// <returns>
 		/// An <see cref="IQueryable{T}" /> with added select actions.
@@ -715,7 +715,7 @@ namespace QueryMakerLibrary
 
 		/// <summary>
 		/// <para>Shortcut method which only performs filtering on <paramref name="query" /> using <paramref name="filter" />.</para>
-		/// <para>For perming all operations, use <see cref="MakeQuery" /> or <see cref="MakeQueryResult" />.</para>
+		/// <para>For perming all operations, use <see cref="MakeQuery{T}(IQueryable{T}, QueryMaker)" /> or <see cref="MakeQueryResult{T}(IQueryable{T}, QueryMaker)" />.</para>
 		/// </summary>
 		/// <returns>
 		/// An <see cref="IQueryable{T}" /> with added filter actions.
@@ -734,7 +734,7 @@ namespace QueryMakerLibrary
 
 		/// <summary>
 		/// <para>Shortcut method which only performs sorting on <paramref name="query" /> using <paramref name="sort" /> instance.</para>
-		/// <para>For perming all operations, use <see cref="MakeQuery" /> or <see cref="MakeQueryResult" />.</para>
+		/// <para>For perming all operations, use <see cref="MakeQuery{T}(IQueryable{T}, QueryMaker)" /> or <see cref="MakeQueryResult{T}(IQueryable{T}, QueryMaker)" />.s</para>
 		/// </summary>
 		/// <returns>
 		/// An <see cref="IQueryable{T}" /> with added sorting actions.
@@ -753,7 +753,7 @@ namespace QueryMakerLibrary
 
 		/// <summary>
 		/// <para>Shortcut method which only performs paging actions on <paramref name="query" /> using <paramref name="page" /> instance.</para>
-		/// <para>For perming all operations, use <see cref="MakeQuery" /> or <see cref="MakeQueryResult" />.</para>
+		/// <para>For perming all operations, use <see cref="MakeQuery{T}(IQueryable{T}, QueryMaker)" /> or <see cref="MakeQueryResult{T}(IQueryable{T}, QueryMaker)" />.</para>
 		/// </summary>
 		/// <returns>
 		/// An <see cref="IQueryable{T}" /> with added paging actions.
@@ -772,7 +772,7 @@ namespace QueryMakerLibrary
 
 		/// <summary>
 		/// <para>Shortcut method which only performs selecting on <paramref name="query" /> using <paramref name="select" /> instance.</para>
-		/// <para>For perming all operations, use <see cref="MakeQuery" /> or <see cref="MakeQueryResult" />.</para>
+		/// <para>For perming all operations, use <see cref="MakeQuery{T}(IQueryable{T}, QueryMaker)" /> or <see cref="MakeQueryResult{T}(IQueryable{T}, QueryMaker)" />.</para>
 		/// </summary>
 		/// <returns>
 		/// An <see cref="IQueryable{T}" /> with added select actions.

@@ -130,8 +130,8 @@ In both cases, Entity Framework will generate the following SQL query:
 - [x] Add a method which returns the resulting query and the total count of items without pagination
 - [x] Add functionality for performing pagination using an index
 - [x] Create method implementations for adding components on a QueryMaker instance
+- [x] Add support for IEnumerable and it's inherited interfaces (IList, ICollection...)
 - [ ] Create documentation/tutorial for using the library
-- [ ] Add support for IEnumerable and it's inherited interfaces (IList, ICollection...)
 - [ ] Add static configuration class for setting defaults (i.e. IgnoreCase = true/false by default...)
 
 <br />

@@ -8,9 +8,10 @@ namespace QueryMakerLibrary
 {
 	internal sealed class ActionExpression
 	{
-		#region PRIVATE MEMBERS
+        #region PRIVATE MEMBERS
 
-		private Expression? _memberExpression;
+        private FilterActions _action;
+        private Expression? _memberExpression;
 		private ConstantExpression? _valueExpression;
 		private Type? _actualMemberType;
 
@@ -19,8 +20,20 @@ namespace QueryMakerLibrary
 		#region INTERNAL MEMBERS
 
 		internal string Field { get; set; }
-		internal FilterActions Action { get; set; }
-		internal bool Negate { get; set; } = false;
+
+        internal FilterActions Action
+        {
+            get => _action;
+            set
+            {
+                _action = value;
+                IsContentAction = Action is FilterActions.Contains or FilterActions.NotContains
+                    or FilterActions.StartsWith or FilterActions.NotStartsWith
+                    or FilterActions.EndsWith or FilterActions.NotEndsWith;
+            }
+        }
+
+        internal bool Negate { get; set; } = false;
 		internal bool IgnoreCase { get; set; } = false;
 
 		internal Expression MemberExpression
@@ -31,13 +44,11 @@ namespace QueryMakerLibrary
 				_memberExpression = value ?? throw new Exception(NotNullalbleMember("MemberExpression"));
 
 				IsMemberEnumerable = MemberMethods.IsEnumerableType(MemberExpression.Type);
-				IsMemberExpressionString = (IsMemberEnumerable
-					? MemberExpression.Type.GetGenericArguments()[0]
-					: MemberExpression.Type).Equals(typeof(string));
-
-				ActualMemberType = IsMemberEnumerable
-					? MemberExpression.Type.GetGenericArguments()[0]
-					: MemberExpression.Type;
+				ActualMemberType = IsMemberEnumerable || MemberMethods.IsNullableType(MemberExpression.Type)
+                    ? MemberExpression.Type.GetGenericArguments()[0]
+                    : MemberExpression.Type;
+                
+				IsMemberExpressionString = ActualMemberType == typeof(string);
 			}
 		}
 
@@ -78,6 +89,8 @@ namespace QueryMakerLibrary
 			private set => _actualMemberType = value;
 		}
 
+		internal bool IsContentAction { get; private set; }
+
 		#endregion READONLY MEMBERS
 
 		#endregion INTERNAL MEMBERS
@@ -95,18 +108,7 @@ namespace QueryMakerLibrary
 			IgnoreCase = ignoreCase;
 			MemberExpression = memberExpression;
 			ValueExpression = CreateExpression.ConstantExpression(ActualMemberType,
-				field, value);
-		}
-
-		internal ActionExpression(string field, FilterActions action, bool negate, bool ignoreCase,
-			Expression memberExpression, ConstantExpression valueExpression)
-		{
-			Field = field;
-			Action = action;
-			Negate = negate;
-			IgnoreCase = ignoreCase;
-			MemberExpression = memberExpression;
-			ValueExpression = valueExpression;
+				field, value, IsContentAction);
 		}
 
 		#endregion CONSTRUCTOR

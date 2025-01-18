@@ -9,7 +9,7 @@ namespace QueryMakerLibrary.Logic
 	{
 		#region Object Conversions
 
-		internal static object? ConvertValueToPropertyType(Type propertyType, object? value)
+		internal static object? ConvertValueToPropertyType(Type propertyType, object? value, bool isContentAction)
 		{
 			if (value is null)
 			{
@@ -24,7 +24,7 @@ namespace QueryMakerLibrary.Logic
 					List<object?> objectsList = new List<object?>();
 					foreach (object? item in (value as IList) ?? throw Errors.Exception(Errors.ExpressionValueToList))
 					{
-						objectsList.Add(ConvertObjectToType(converter, item));
+						objectsList.Add(ConvertObjectToType(converter, item, isContentAction));
 					}
 
 					// return list of different objects
@@ -32,14 +32,14 @@ namespace QueryMakerLibrary.Logic
 				}
 				else
 				{
-					return ConvertObjectToType(converter, value);
+					return ConvertObjectToType(converter, value, isContentAction);
 				}
 			}
 		}
 
-		private static object? ConvertObjectToType(TypeConverter converter, object? value)
+		private static object? ConvertObjectToType(TypeConverter converter, object? value, bool isContentAction)
 		{
-			if (value is not null)
+			if (value is not null && !(isContentAction && value is string))
 			{
 				try
 				{
@@ -48,7 +48,7 @@ namespace QueryMakerLibrary.Logic
 						value = converter.ConvertFrom(value);
 					}
 				}
-				catch (Exception)
+				catch
 				{
 					//
 				}
@@ -61,7 +61,7 @@ namespace QueryMakerLibrary.Logic
 
 		#region JsonElement Conversions
 
-		internal static Object? ConvertJsonElementToValidType(Type propertyType, JsonElement jsonElement)
+		internal static object? ConvertJsonElementToValidType(Type propertyType, JsonElement jsonElement, bool isContentAction)
 		{
 			switch (jsonElement.ValueKind)
 			{
@@ -72,32 +72,29 @@ namespace QueryMakerLibrary.Logic
 					return DeserializeJsonElement(propertyType, jsonElement);
 
 				case JsonValueKind.Array:
-					// IList list = (IList)(Activator.CreateInstance(
-					// 	typeof(List<>).MakeGenericType(new [] { typeof(object) }))
-					// 		?? throw Errors.Exception(Errors.ConvertJsonArrayToList, jsonElement));
-
-					List<object?> objectsList = new List<object?>();
-					jsonElement.EnumerateArray().ToList()
-						.ForEach(o => objectsList.Add(ConvertJsonElementToValidType(propertyType, o)));
-
-					// return list of different objects
-					return objectsList;
+					return jsonElement.EnumerateArray().ToList()
+						.Select(o => ConvertJsonElementToValidType(propertyType, o, isContentAction));
 
 				case JsonValueKind.String: case JsonValueKind.Number:
 				case JsonValueKind.False: case JsonValueKind.True:
 				default:
-					return ConvertJsonElementValueToValidType(propertyType, jsonElement);
+					return ConvertJsonElementValueToValidType(propertyType, jsonElement, isContentAction);
 			}
 		}
 
-		private static Object? DeserializeJsonElement<T>(T objectType, JsonElement jsonElement)
+		private static object? DeserializeJsonElement<T>(T objectType, JsonElement jsonElement)
 		{
 			return jsonElement.Deserialize<T>();
 		}
 
-		private static Object ConvertJsonElementValueToValidType(Type objectType, JsonElement jsonElement)
+		private static object? ConvertJsonElementValueToValidType(Type objectType, JsonElement jsonElement, bool isContentAction)
 		{
 			bool isString = jsonElement.ValueKind is JsonValueKind.String;
+
+			if (isString && isContentAction)
+			{
+				return jsonElement.ToString();
+			}
 
 			try
 			{
@@ -161,7 +158,7 @@ namespace QueryMakerLibrary.Logic
 					// 	return Enum.Parse(value);
 
 					case PrimtiveTypes.OBJECT:
-						return (object)jsonElement;
+						return jsonElement;
 
 					default:
 						throw Errors.Exception(Errors.InvalidTypeConversion);

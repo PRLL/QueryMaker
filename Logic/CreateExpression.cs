@@ -9,26 +9,18 @@ namespace QueryMakerLibrary.Logic
 		/// <summary>
 		/// Convert 'value' to expression's property and return as ConstantExpression
 		/// </summary>
-		internal static ConstantExpression ConstantExpression(Type propertyType, string field, object? value)
+		internal static ConstantExpression ConstantExpression(Type propertyType, string field, object? value, bool isContentAction)
 		{
-			Object? actualValue = value;
 			try
 			{
-				if (value is JsonElement)
-				{
-					actualValue = TypeConversions.ConvertJsonElementToValidType(propertyType, (JsonElement)value);
-				}
-				else
-				{
-					actualValue = TypeConversions.ConvertValueToPropertyType(propertyType, value);
-				}
+				return Expression.Constant(value is JsonElement jsonElement
+					? TypeConversions.ConvertJsonElementToValidType(propertyType, jsonElement, isContentAction)
+					: TypeConversions.ConvertValueToPropertyType(propertyType, value, isContentAction));
 			}
 			catch (Exception ex)
 			{
 				throw Errors.Exception(Errors.GenerateExpressionError, field, value, ex);
 			}
-
-			return Expression.Constant(actualValue);
 		}
 
 		/// <summary>

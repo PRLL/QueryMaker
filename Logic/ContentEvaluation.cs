@@ -10,20 +10,10 @@ namespace QueryMakerLibrary.Logic
 	{
 		internal static Expression CreateEvaluationExpression(ActionExpression actionExpression, object? value)
 		{
-			bool isContentAction = false;
-			switch (actionExpression.Action)
-			{
-				case FilterActions.Contains: case FilterActions.NotContains:
-				case FilterActions.StartsWith: case FilterActions.NotStartsWith:
-				case FilterActions.EndsWith: case FilterActions.NotEndsWith:
-					isContentAction = true;
-					break;
-			}
-
-			bool itemSameTypeAsMember = value is not null && value.GetType().Equals(actionExpression.MemberExpression.Type);
+			bool itemSameTypeAsMember = value is not null && value.GetType() == actionExpression.ActualMemberType;
 
 			Expression typedMemberExpression = !actionExpression.IsMemberExpressionString
-				&& (!itemSameTypeAsMember || isContentAction)
+				&& (!itemSameTypeAsMember || actionExpression.IsContentAction)
 					? Expression.Call(
 						actionExpression.MemberExpression,
 						"ToString",
@@ -32,30 +22,32 @@ namespace QueryMakerLibrary.Logic
 
 			Expression typedValueExpression = Expression.Constant(
 				value is not null && !value.GetType().Equals(typeof(string))
-				&& (!itemSameTypeAsMember || isContentAction)
+				&& (!itemSameTypeAsMember || actionExpression.IsContentAction)
 					? Convert.ToString(value)
 					: value);
 
 			bool isMemberExpressionStringType = typedMemberExpression.Type == typeof(string);
 
-			if (actionExpression.IgnoreCase)
+            if (actionExpression.IsContentAction && value is null)
+            {
+                typedValueExpression = Expression.Constant("null");
+            }
+			else if (MemberMethods.IsNullableType(typedMemberExpression.Type)
+				&& !MemberMethods.IsNullableType(typedValueExpression.Type))
 			{
-				if (isMemberExpressionStringType)
-				{
-					typedMemberExpression = Expression.Call(typedMemberExpression,
-						"ToLower",
-						Type.EmptyTypes);
+                typedValueExpression = Expression.Convert(typedValueExpression, typedMemberExpression.Type);
+            }
 
-					typedValueExpression = Expression.Call(
-						typedValueExpression,
-						"ToLower",
-						Type.EmptyTypes);
-				}
-			}
-
-			if (isContentAction && value is null)
+            if (actionExpression.IgnoreCase && isMemberExpressionStringType)
 			{
-				typedValueExpression = Expression.Constant("null");
+				typedMemberExpression = Expression.Call(typedMemberExpression,
+					"ToLower",
+					Type.EmptyTypes);
+
+				typedValueExpression = Expression.Call(
+					typedValueExpression,
+					"ToLower",
+					Type.EmptyTypes);
 			}
 
 			Expression? evaluationExpression = null;

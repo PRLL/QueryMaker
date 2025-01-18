@@ -25,5 +25,10 @@ namespace QueryMakerLibrary.Logic
 		{
 			return type.Name != nameof(String) && type.GetInterface(nameof(IEnumerable)) != null;
 		}
+
+		internal static bool IsNullableType(Type type)
+		{
+			return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+		}
 	}
 }

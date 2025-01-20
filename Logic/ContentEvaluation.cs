@@ -10,10 +10,9 @@ namespace QueryMakerLibrary.Logic
 	{
 		internal static Expression CreateEvaluationExpression(ActionExpression actionExpression, object? value)
 		{
-			bool itemSameTypeAsMember = value is not null && value.GetType() == actionExpression.ActualMemberType;
-
 			Expression typedMemberExpression = !actionExpression.IsMemberExpressionString
-				&& (!itemSameTypeAsMember || actionExpression.IsContentAction)
+				&& value is not null
+				&& (value.GetType() != actionExpression.ActualMemberType || actionExpression.IsContentAction)
 					? Expression.Call(
 						actionExpression.MemberExpression,
 						"ToString",
@@ -22,7 +21,7 @@ namespace QueryMakerLibrary.Logic
 
 			Expression typedValueExpression = Expression.Constant(
 				value is not null && !value.GetType().Equals(typeof(string))
-				&& (!itemSameTypeAsMember || actionExpression.IsContentAction)
+				&& (value.GetType() != actionExpression.ActualMemberType || actionExpression.IsContentAction)
 					? Convert.ToString(value)
 					: value);
 

@@ -10,9 +10,12 @@ namespace QueryMakerLibrary.Logic
 	{
 		internal static Expression CreateEvaluationExpression(ActionExpression actionExpression, object? value)
 		{
+			bool valueIsNull = value is null;
+			Type? valueType = value?.GetType();
+
 			Expression typedMemberExpression = !actionExpression.IsMemberExpressionString
-				&& value is not null
-				&& (value.GetType() != actionExpression.ActualMemberType || actionExpression.IsContentAction)
+				&& !valueIsNull
+				&& (valueType != actionExpression.ActualMemberType || actionExpression.IsContentAction)
 					? Expression.Call(
 						actionExpression.MemberExpression,
 						"ToString",
@@ -20,14 +23,15 @@ namespace QueryMakerLibrary.Logic
 					: actionExpression.MemberExpression;
 
 			Expression typedValueExpression = Expression.Constant(
-				value is not null && !value.GetType().Equals(typeof(string))
-				&& (value.GetType() != actionExpression.ActualMemberType || actionExpression.IsContentAction)
+				!valueIsNull && valueType != typeof(string)
+				&& (valueType != actionExpression.ActualMemberType || actionExpression.IsContentAction)
 					? Convert.ToString(value)
 					: value);
 
 			bool isMemberExpressionStringType = typedMemberExpression.Type == typeof(string);
 
-            if (actionExpression.IsContentAction && value is null)
+            if (actionExpression.IsContentAction && valueIsNull
+				|| (isMemberExpressionStringType && actionExpression.IsGreaterOrLessThanAction))
             {
                 typedValueExpression = Expression.Constant("null");
             }
@@ -37,7 +41,7 @@ namespace QueryMakerLibrary.Logic
                 typedValueExpression = Expression.Convert(typedValueExpression, typedMemberExpression.Type);
             }
 
-            if (actionExpression.IgnoreCase && isMemberExpressionStringType)
+            if (!valueIsNull && actionExpression.IgnoreCase && isMemberExpressionStringType)
 			{
 				typedMemberExpression = Expression.Call(typedMemberExpression,
 					"ToLower",

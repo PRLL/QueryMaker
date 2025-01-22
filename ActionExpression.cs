@@ -27,10 +27,15 @@ namespace QueryMakerLibrary
             set
             {
                 _action = value;
+
                 IsContentAction = Action is FilterActions.Contains or FilterActions.NotContains
                     or FilterActions.StartsWith or FilterActions.NotStartsWith
                     or FilterActions.EndsWith or FilterActions.NotEndsWith;
-            }
+
+				IsGreaterOrLessThanAction = Action is FilterActions.GreaterThan
+					or FilterActions.LessThan or FilterActions.GreaterThanOrEqual
+					or FilterActions.LessThanOrEqual;
+			}
         }
 
         internal bool Negate { get; set; } = false;
@@ -90,6 +95,7 @@ namespace QueryMakerLibrary
 		}
 
 		internal bool IsContentAction { get; private set; }
+		internal bool IsGreaterOrLessThanAction { get; private set; }
 
 		#endregion READONLY MEMBERS
 

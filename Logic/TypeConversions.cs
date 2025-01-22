@@ -72,8 +72,9 @@ namespace QueryMakerLibrary.Logic
 					return DeserializeJsonElement(propertyType, jsonElement);
 
 				case JsonValueKind.Array:
-					return jsonElement.EnumerateArray().ToList()
-						.Select(o => ConvertJsonElementToValidType(propertyType, o, isContentAction));
+					return jsonElement.EnumerateArray()
+						.Select(o => ConvertJsonElementToValidType(propertyType, o, isContentAction))
+						.ToList();
 
 				case JsonValueKind.String: case JsonValueKind.Number:
 				case JsonValueKind.False: case JsonValueKind.True:

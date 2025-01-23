@@ -20,14 +20,12 @@ namespace QueryMakerLibrary.Logic
 				TypeConverter converter = TypeDescriptor.GetConverter(propertyType);
 				if (MemberMethods.IsEnumerableType(value.GetType()))
 				{
-					// try converting all item to same propertyType and store on 'objectsList'
-					List<object?> objectsList = new List<object?>();
-					foreach (object? item in (value as IList) ?? throw Errors.Exception(Errors.ExpressionValueToList))
+					List<object?> objectsList = new();
+					foreach (object? item in (value as IEnumerable) ?? throw Errors.Exception(Errors.ExpressionValueToList))
 					{
 						objectsList.Add(ConvertObjectToType(converter, item, isContentAction));
 					}
 
-					// return list of different objects
 					return objectsList;
 				}
 				else

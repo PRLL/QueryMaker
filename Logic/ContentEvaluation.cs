@@ -40,6 +40,11 @@ namespace QueryMakerLibrary.Logic
 			{
                 typedValueExpression = Expression.Convert(typedValueExpression, typedMemberExpression.Type);
             }
+			else if (valueIsNull && !MemberMethods.IsNullableType(typedValueExpression.Type))
+			{
+				typedValueExpression = Expression.Convert(typedValueExpression, typeof(Nullable<>).MakeGenericType(typedMemberExpression.Type));
+				typedMemberExpression = Expression.Convert(typedMemberExpression, typeof(Nullable<>).MakeGenericType(typedMemberExpression.Type));
+			}
 
             if (!valueIsNull && actionExpression.IgnoreCase && isMemberExpressionStringType)
 			{

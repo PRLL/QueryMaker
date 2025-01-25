@@ -10,7 +10,6 @@ namespace QueryMakerLibrary.Constants
 			SearchFieldEmpty = "One of the passed fields for global search was empty",
 			FilterFieldsEmpty = "No Fields passed for a Filter action",
 			FilterParametersEmpty = "Some required parameter(s) are empty of single Filter object passed '{0}'",
-			GeneratedExpressionNull = "Generated expression was null",
 			FilterInvalidAction = "Invalid 'Action' value passed for a Filter",
 			InvalidOperationValue = "Invalid 'Operation' value '{0}'",
 			SortFieldEmpty = "Field for sorting was empty",

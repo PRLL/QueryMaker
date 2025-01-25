@@ -7,7 +7,7 @@ namespace QueryMakerLibrary.Logic
 {
 	internal static class FilterMethods
 	{
-		internal static Expression FilterAction<T>(ParameterExpression parameterExpression, Filter filter)
+		internal static Expression? FilterAction<T>(ParameterExpression parameterExpression, Filter filter)
 		{
 			if (MemberMethods.IsEnumerableType(typeof(T)))
 			{
@@ -18,11 +18,10 @@ namespace QueryMakerLibrary.Logic
 
 				return ContentEvaluation.CreateListContentEvaluationExpression(new ActionExpression(
 					string.Empty, filter.Action, filter.Negate, filter.IgnoreCase,
-					parameterExpression,
-					filter.Value));
+					parameterExpression, filter.Value));
 			}
 
-			Expression? whereExpression = filter.IsJoiner ? null : CreateFilterExpression<T>(parameterExpression, filter);
+			Expression? filterExpression = filter.IsJoiner ? null : CreateFilterExpression<T>(parameterExpression, filter);
 
 			if (filter.SubFilters.Any())
 			{
@@ -36,43 +35,27 @@ namespace QueryMakerLibrary.Logic
 				{
 					predicatesExpression = FilterAction<T>(parameterExpression, predicate);
 
-					if (predicatesExpression is null)
-					{
-						throw Errors.Exception(Errors.GeneratedExpressionNull);
-					}
-
-					whereExpression = predicatesExpression is not null
-						? WhereExpressionOperationHandler(whereExpression, predicatesExpression, filter.SubFiltersOperation)
-						: predicatesExpression;
+					filterExpression = filterExpression is null
+						? predicatesExpression
+						: predicatesExpression is null
+							? filterExpression
+							: WhereExpressionOperationHandler(filterExpression, predicatesExpression, filter.SubFiltersOperation);
 				}
 			}
 
-			if (whereExpression is null)
-			{
-				throw Errors.Exception(Errors.GeneratedExpressionNull);
-			}
-
-			return whereExpression;
+			return filterExpression;
 		}
 
 		private static Expression? CreateFilterExpression<T>(ParameterExpression parameterExpression, Filter filter, Expression? newExpression = null)
 		{
-			// bool fieldsFromClass = !filter.Fields.Any();
-			// if (fieldsFromClass)
-			// {
-			// 	filter.Fields = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance).Select(x => x.Name)
-			// 		// .Concat(typeof(T).GetMembers(BindingFlags.Public | BindingFlags.Instance).Select(x => x.Name))
-			// 		.ToArray();
-			// }
-
 			if (!filter.Fields.Any())
 			{
 				throw Errors.Exception(Errors.FilterFieldsEmpty);
 			}
 
-			if (filter.Fields.Count() > 1 && !EnumMethods.IsValidOperation(filter.FieldsOperation))
+			if (filter.Fields.Length > 1 && !EnumMethods.IsValidOperation(filter.FieldsOperation))
 			{
-				throw Errors.Exception(/*fieldsFromClass ? Errors.ClassMembersNoOperation : */Errors.MultipleFieldsNoOperation);
+				throw Errors.Exception(Errors.MultipleFieldsNoOperation);
 			}
 
 			foreach (string field in filter.Fields)
@@ -82,14 +65,16 @@ namespace QueryMakerLibrary.Logic
 					throw Errors.Exception(Errors.FilterInvalidAction);
 				}
 
-				Expression createdExpression = CreateExpression.ActionExpression(new ActionExpression(
+				Expression? createdExpression = CreateExpression.ActionExpression(new ActionExpression(
 					field, filter.Action, filter.Negate, filter.IgnoreCase,
 					MemberMethods.GetPropertyOrField<T>(parameterExpression, field),
 					filter.Value));
 
-				newExpression = newExpression is not null
-					? WhereExpressionOperationHandler(newExpression, createdExpression, filter.FieldsOperation)
-					: createdExpression;
+				newExpression = newExpression is null
+					? createdExpression
+					: createdExpression is null
+						? newExpression
+						: WhereExpressionOperationHandler(newExpression, createdExpression, filter.FieldsOperation);
 			}
 
 			return newExpression;

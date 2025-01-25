@@ -111,10 +111,14 @@ namespace QueryMakerLibrary
 			{
 				ParameterExpression parameterExpression = Expression.Parameter(typeof(T), Miscellaneous.INSTANCE);
 
-				return query.Where(
-					Expression.Lambda<Func<T, bool>>(
-						FilterMethods.FilterAction<T>(parameterExpression, filter),
-						parameterExpression));
+				Expression? filterExpression = FilterMethods.FilterAction<T>(parameterExpression, filter);
+				if (filterExpression is not null)
+				{
+					return query.Where(
+						Expression.Lambda<Func<T, bool>>(
+							filterExpression,
+							parameterExpression));
+				}
 			}
 
 			return query;

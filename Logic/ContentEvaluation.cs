@@ -189,7 +189,7 @@ namespace QueryMakerLibrary.Logic
 			}
 		}
 
-		private static Expression? CreateListToValueEvaluationExpression<T>(Expression MemberExpression, ActionExpression anyActionExpression, object? item)
+		internal static Expression? CreateListToValueEvaluationExpression<T>(Expression MemberExpression, ActionExpression anyActionExpression, object? item)
 		{
 			Expression? filterExpression = CreateEvaluationExpression(anyActionExpression, item);
 

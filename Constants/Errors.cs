@@ -17,7 +17,7 @@ namespace QueryMakerLibrary.Constants
 			DistinctFieldEmpty = "One of the passed fields for distinctBy was empty",
 			InvalidTypeConversion = "Invalid type conversion",
 			ConvertJsonArrayToList = "Converting passed json array value '{0}' to a List",
-			GenerateExpressionError = "Creating expression for field '{0}' with value '{1}'. {2}",
+			GenerateExpressionError = "Creating expression for field '{0}' with value '{1}'.",
 			DistincByAfterSelect = "Tried using 'DistinctBy' and 'Select' together, but some fields sent on 'DistinctBy' are missing from 'Select'",
 			ListToListNotImplemeneted = "{0} list to list content evaluation expression not implemented yet",
 			ExpressionValueToList = "Error ocurred converting expression value to List",
@@ -27,7 +27,6 @@ namespace QueryMakerLibrary.Constants
 			ClassMembersNoOperation = "Passed a Filter object without 'Fields', tried using fields and properties from root class and multiple where found, "
 				+ "but no 'FieldsOperation' was passed to join them",
 			MultipleFieldsNoOperation = "Passed a Filter object with multiple 'Fields', but value on 'FieldsOperation' is not a valid operation",
-			FieldTypeNull = "Passed Field {0} was null",
 			AddingSort = "Cannot set ThenSortBy because there's no root Sort set";
 
 		internal static Exception Exception(string errorMessage)

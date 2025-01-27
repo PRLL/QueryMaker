@@ -6,7 +6,7 @@ namespace QueryMakerLibrary.Logic
 {
 	internal static class CreateExpression
 	{
-		internal static ConstantExpression ConstantExpression(Type propertyType, string field, object? value, bool isContentAction)
+		internal static ConstantExpression ConstantExpression(Type propertyType, string? field, object? value, bool isContentAction)
 		{
 			try
 			{
@@ -14,9 +14,9 @@ namespace QueryMakerLibrary.Logic
 					? TypeConversions.ConvertJsonElementToValidType(propertyType, jsonElement, isContentAction)
 					: TypeConversions.ConvertValueToPropertyType(propertyType, value, isContentAction));
 			}
-			catch (Exception ex)
+			catch
 			{
-				throw Errors.Exception(Errors.GenerateExpressionError, field, value, ex);
+				throw Errors.Exception(Errors.GenerateExpressionError, field ?? "", value);
 			}
 		}
 

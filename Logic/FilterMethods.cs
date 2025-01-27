@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using System.Reflection;
 using QueryMakerLibrary.Components;
 using QueryMakerLibrary.Constants;
 using static QueryMakerLibrary.Components.Filter;
@@ -48,9 +49,11 @@ namespace QueryMakerLibrary.Logic
 
 		private static Expression? CreateFilterExpression<T>(ParameterExpression parameterExpression, Filter filter, Expression? newExpression = null)
 		{
-			if (!filter.Fields.Any())
+			if (filter.Fields.Length < 1)
 			{
-				throw Errors.Exception(Errors.FilterFieldsEmpty);
+				return CreateExpression.ActionExpression(new(
+					null, filter.Action, filter.Negate, filter.IgnoreCase,
+					parameterExpression, filter.Value));
 			}
 
 			if (filter.Fields.Length > 1 && !EnumMethods.IsValidOperation(filter.FieldsOperation))

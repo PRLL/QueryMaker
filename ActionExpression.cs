@@ -19,8 +19,6 @@ namespace QueryMakerLibrary
 
 		#region INTERNAL MEMBERS
 
-		internal string Field { get; set; }
-
         internal FilterActions Action
         {
             get => _action;
@@ -49,7 +47,7 @@ namespace QueryMakerLibrary
 				_memberExpression = value ?? throw new Exception(NotNullalbleMember("MemberExpression"));
 
 				IsMemberEnumerable = MemberMethods.IsEnumerableType(MemberExpression.Type);
-				ActualMemberType = IsMemberEnumerable || MemberMethods.IsNullableType(MemberExpression.Type)
+				_actualMemberType = IsMemberEnumerable || MemberMethods.IsNullableType(MemberExpression.Type)
                     ? MemberExpression.Type.GetGenericArguments()[0]
                     : MemberExpression.Type;
                 
@@ -90,8 +88,7 @@ namespace QueryMakerLibrary
 		[Description("If Member's Expression is an Enumerable, then return type of Enumerable")]
 		internal Type ActualMemberType
 		{
-			get => _actualMemberType ?? throw Errors.Exception(Errors.FieldTypeNull, this.Field);
-			private set => _actualMemberType = value;
+			get => _actualMemberType ?? throw new Exception(NotNullalbleMember("MemberExpression"));
 		}
 
 		internal bool IsContentAction { get; private set; }
@@ -105,10 +102,9 @@ namespace QueryMakerLibrary
 		#region CONSTRUCTOR
 
 
-		internal ActionExpression(string field, FilterActions action, bool negate, bool ignoreCase,
+		internal ActionExpression(string? field, FilterActions action, bool negate, bool ignoreCase,
 			Expression memberExpression, object? value)
 		{
-			Field = field;
 			Action = action;
 			Negate = negate;
 			IgnoreCase = ignoreCase;

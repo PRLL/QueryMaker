@@ -35,15 +35,15 @@ namespace QueryMakerLibrary.Logic
 			}
 		}
 
-		private static object? ConvertObjectToType(TypeConverter converter, object? value, bool isContentAction)
+		private static object? ConvertObjectToType(TypeConverter converter, object? item, bool isContentAction)
 		{
-			if (value is not null && !(isContentAction && value is string))
+			if (item is not null && !(isContentAction && item is string))
 			{
 				try
 				{
-					if (converter.CanConvertFrom(value.GetType()))
+					if (converter.CanConvertFrom(item.GetType()))
 					{
-						value = converter.ConvertFrom(value);
+						item = converter.ConvertFrom(item);
 					}
 				}
 				catch
@@ -52,7 +52,7 @@ namespace QueryMakerLibrary.Logic
 				}
 			}
 
-			return value;
+			return item;
 		}
 
 		#endregion Object Conversions

@@ -5,8 +5,6 @@ namespace QueryMakerLibrary.Logic
 {
 	internal static class EnumMethods
 	{
-		private static readonly uint[] validActions = new uint[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
-
 		internal static bool IsValidAction(FilterActions action)
 		{
 			return Enum.IsDefined(typeof(FilterActions), action);
@@ -38,8 +36,6 @@ namespace QueryMakerLibrary.Logic
 					throw new Exception(Errors.ActionText);
 			}
 		}
-
-		private static readonly uint[] validOperations = new uint[] { 1, 2, 3, 4 };
 
 		internal static bool IsValidOperation(FilterOperations operation)
 		{

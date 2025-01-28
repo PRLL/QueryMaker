@@ -73,17 +73,6 @@ namespace QueryMakerLibrary
 
 		internal bool IsMemberExpressionString { get; private set; }
 
-		internal bool ConvertMemberExpressionToString
-		{
-			get => !MemberExpression.Type.Equals(ValueExpression.Type)
-					&& !MemberExpression.Type.Equals(typeof(string));
-		}
-		internal bool ConvertValueExpressionToString
-		{
-			get => !MemberExpression.Type.Equals(ValueExpression.Type)
-					&& !ValueExpression.Type.Equals(typeof(string));
-		}
-
 		[Category("Read Only")]
 		[Description("If Member's Expression is an Enumerable, then return type of Enumerable")]
 		internal Type ActualMemberType

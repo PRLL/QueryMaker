@@ -41,26 +41,28 @@ namespace QueryMakerLibrary
 
 		internal Expression MemberExpression
 		{
-			get =>_memberExpression ?? throw new Exception(NotNullalbleMember("MemberExpression"));
+			get =>_memberExpression ?? throw new Exception(NotNullalbleMember(nameof(MemberExpression)));
 			set
 			{
-				_memberExpression = value ?? throw new Exception(NotNullalbleMember("MemberExpression"));
+				_memberExpression = value ?? throw new Exception(NotNullalbleMember(nameof(MemberExpression)));
 
 				IsMemberEnumerable = MemberMethods.IsEnumerableType(MemberExpression.Type);
-				_actualMemberType = IsMemberEnumerable || MemberMethods.IsNullableType(MemberExpression.Type)
+
+				ActualMemberType = IsMemberEnumerable
                     ? MemberExpression.Type.GetGenericArguments()[0]
-                    : MemberExpression.Type;
+                    : MemberMethods.GetActualType(MemberExpression.Type);
                 
-				IsMemberExpressionString = ActualMemberType == typeof(string);
+				IsMemberString = ActualMemberType == typeof(string);
 			}
 		}
 
 		internal ConstantExpression ValueExpression
 		{
-			get =>_valueExpression ?? throw new Exception(NotNullalbleMember("ValueExpression"));
+			get =>_valueExpression ?? throw new Exception(NotNullalbleMember(nameof(ValueExpression)));
 			set
 			{
-				_valueExpression = value ?? throw new Exception(NotNullalbleMember("ValueExpression"));
+				_valueExpression = value ?? throw new Exception(NotNullalbleMember(nameof(ValueExpression)));
+
 				IsValueEnumerable = MemberMethods.IsEnumerableType(ValueExpression.Type);
 			}
 		}
@@ -68,16 +70,16 @@ namespace QueryMakerLibrary
 		#region READONLY MEMBERS
 
 		internal bool IsMemberEnumerable { get; private set; }
+		internal bool IsMemberString { get; private set; }
 
 		internal bool IsValueEnumerable { get; private set; }
-
-		internal bool IsMemberExpressionString { get; private set; }
 
 		[Category("Read Only")]
 		[Description("If Member's Expression is an Enumerable, then return type of Enumerable")]
 		internal Type ActualMemberType
 		{
-			get => _actualMemberType ?? throw new Exception(NotNullalbleMember("MemberExpression"));
+			get => _actualMemberType ?? throw new Exception(NotNullalbleMember(nameof(ActualMemberType)));
+			set => _actualMemberType = value;
 		}
 
 		internal bool IsContentAction { get; private set; }
@@ -109,7 +111,7 @@ namespace QueryMakerLibrary
 
 		private static string NotNullalbleMember(string member)
 		{
-			return string.Format(Errors.NotNullableMember, member, "ActionExpression");
+			return string.Format(Errors.NotNullableMember, member, nameof(ActionExpression));
 		}
 
 		#endregion METHODS

@@ -17,7 +17,7 @@ namespace QueryMakerLibrary.Logic
 					throw Errors.Exception(Errors.FilterInvalidAction);
 				}
 
-				return ContentEvaluation.CreateListContentEvaluationExpression(new ActionExpression(
+				return ContentEvaluation.CreateListContentEvaluationExpression(new(
 					string.Empty, filter.Action, filter.Negate, filter.IgnoreCase,
 					parameterExpression, filter.Value));
 			}
@@ -68,7 +68,7 @@ namespace QueryMakerLibrary.Logic
 					throw Errors.Exception(Errors.FilterInvalidAction);
 				}
 
-				Expression? createdExpression = CreateExpression.ActionExpression(new ActionExpression(
+				Expression? createdExpression = CreateExpression.ActionExpression(new(
 					field, filter.Action, filter.Negate, filter.IgnoreCase,
 					MemberMethods.GetPropertyOrField<T>(parameterExpression, field),
 					filter.Value));

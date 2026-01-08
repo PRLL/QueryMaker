@@ -23,12 +23,14 @@ namespace QueryMakerLibrary.Logic
 
 		internal static bool IsEnumerableType(Type type)
 		{
-			return type.Name != nameof(String) && type.GetInterface(nameof(IEnumerable)) != null;
+			return type != typeof(string) && type.GetInterface(nameof(IEnumerable)) is not null;
 		}
 
 		internal static bool IsNullableType(Type type)
 		{
-			return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+			return !type.IsValueType || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>));
 		}
+
+		internal static Type GetActualType(Type type) => Nullable.GetUnderlyingType(type) ?? type;
 	}
 }

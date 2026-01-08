@@ -13,9 +13,11 @@ namespace QueryMakerLibrary.Logic
 			bool valueIsNull = value is null;
 			Type? valueType = value?.GetType();
 
-			Expression typedMemberExpression = !actionExpression.IsMemberExpressionString
-				&& !valueIsNull
-				&& (valueType != actionExpression.ActualMemberType || actionExpression.IsContentAction)
+			bool convertToString = !valueIsNull && (valueType != actionExpression.ActualMemberType || actionExpression.IsContentAction);
+
+			Expression typedMemberExpression =
+				!actionExpression.IsMemberString
+				&& convertToString
 					? Expression.Call(
 						actionExpression.MemberExpression,
 						"ToString",
@@ -23,28 +25,30 @@ namespace QueryMakerLibrary.Logic
 					: actionExpression.MemberExpression;
 
 			Expression typedValueExpression = Expression.Constant(
-				!valueIsNull && valueType != typeof(string)
-				&& (valueType != actionExpression.ActualMemberType || actionExpression.IsContentAction)
+				valueType != typeof(string)
+				&& convertToString
 					? Convert.ToString(value)
 					: value);
 
 			bool isMemberExpressionStringType = typedMemberExpression.Type == typeof(string);
 
-            if (actionExpression.IsContentAction && valueIsNull
-				|| (isMemberExpressionStringType && actionExpression.IsGreaterOrLessThanAction))
+            if (valueIsNull)
             {
-                typedValueExpression = Expression.Constant("null");
+                if (actionExpression.IsContentAction || (isMemberExpressionStringType && actionExpression.IsGreaterOrLessThanAction))
+                {
+                    typedValueExpression = Expression.Constant("null");
+                }
+                else if (!MemberMethods.IsNullableType(typedMemberExpression.Type))
+                {
+                    typedMemberExpression = Expression.Convert(typedMemberExpression, typeof(Nullable<>).MakeGenericType(typedMemberExpression.Type));
+                }
             }
-			else if (MemberMethods.IsNullableType(typedMemberExpression.Type)
+
+			if (MemberMethods.IsNullableType(typedMemberExpression.Type)
 				&& !MemberMethods.IsNullableType(typedValueExpression.Type))
 			{
                 typedValueExpression = Expression.Convert(typedValueExpression, typedMemberExpression.Type);
             }
-			else if (valueIsNull && !MemberMethods.IsNullableType(typedValueExpression.Type))
-			{
-				typedValueExpression = Expression.Convert(typedValueExpression, typeof(Nullable<>).MakeGenericType(typedMemberExpression.Type));
-				typedMemberExpression = Expression.Convert(typedMemberExpression, typeof(Nullable<>).MakeGenericType(typedMemberExpression.Type));
-			}
 
             if (!valueIsNull && actionExpression.IgnoreCase && isMemberExpressionStringType)
 			{
@@ -79,6 +83,7 @@ namespace QueryMakerLibrary.Logic
 					};
 
 					break;
+
 				case FilterActions.Equal:
 					evaluationExpression = Expression.Equal(typedMemberExpression, typedValueExpression);
 					break;
@@ -89,7 +94,8 @@ namespace QueryMakerLibrary.Logic
 
 				case FilterActions.GreaterThan: case FilterActions.LessThan:
 				case FilterActions.GreaterThanOrEqual: case FilterActions.LessThanOrEqual:
-					if (typedMemberExpression.Type == typeof(bool))
+					if (MemberMethods.GetActualType(typedMemberExpression.Type) == typeof(bool)
+						&& MemberMethods.GetActualType(typedValueExpression.Type) == typeof(bool))
 					{
 						typedMemberExpression = Expression.Convert(
 							actionExpression.MemberExpression,

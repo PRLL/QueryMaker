@@ -117,7 +117,7 @@ namespace QueryMakerLibrary
 		{
 			try
 			{
-				return PerformActions.CreateActionsResult(query, this);
+				return this.CreateActionsResult(query);
 			}
 			catch (Exception exception)
 			{

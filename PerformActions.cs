@@ -12,102 +12,62 @@ namespace QueryMakerLibrary
 	{
 		#region Internal Methods
 
-		internal static QueryMakerResult<T> CreateActionsResult<T>(IQueryable<T> query, QueryMaker queryMaker)
+		internal static QueryMakerResult<T> CreateActionsResult<T>(this QueryMaker queryMaker, IQueryable<T> query)
 		{
 			if (query is null)
 			{
 				throw Errors.Exception(Errors.IQueryableNull);
 			}
 
-			IQueryable<T> filteredQuery = CreateFilteredQuery(query, queryMaker.Filter);
+			IQueryable<T> filteredQuery = query.Filter(queryMaker.Filter);
 
+			IQueryable<T> paginatedQuery;
+			IQueryable<T> unpaginatedQuery;
 			if (queryMaker.Select is not null && queryMaker.Select.DistinctBy)
 			{
 				Select select = new(queryMaker.Select.Fields, true);
 
-				IQueryable<T> unpaginatedQuery =
-					CreateSortedQuery(
-						CreateSelectedQuery(
-							filteredQuery,
-							select),
-						queryMaker.Sort,
-						select.Fields);
+				unpaginatedQuery = filteredQuery.Select(select).Sort(queryMaker.Sort, select.Fields);
 
 				select.DistinctBy = false;
 
-				if (queryMaker.Page is not null
-					&& !string.IsNullOrWhiteSpace(queryMaker.Page.Index))
+				if (queryMaker.Page is not null && !string.IsNullOrWhiteSpace(queryMaker.Page.Index))
 				{
 					if (!select.Fields.Contains(queryMaker.Page.Index))
 					{
-						return new(CreatePagedQuery(
-								query, unpaginatedQuery,
-								new(queryMaker.Page.Skip,
-									queryMaker.Page.Take)),
-							unpaginatedQuery);
+						paginatedQuery = query.Page(unpaginatedQuery, new(queryMaker.Page.Skip, queryMaker.Page.Take));
 					}
 					else
 					{
-						return new(CreateSelectedQuery(
-							CreateSortedQuery(
-								CreatePagedQuery(
-									query,
-									unpaginatedQuery,
-									queryMaker.Page),
-								queryMaker.Sort,
-								select.Fields),
-							select),
-							unpaginatedQuery);
+						paginatedQuery = query.Page(unpaginatedQuery, queryMaker.Page).Sort(queryMaker.Sort, select.Fields).Select(select);
 					}
 				}
 				else
 				{
-					return new(CreatePagedQuery(
-							query, unpaginatedQuery,
-							queryMaker.Page),
-						unpaginatedQuery);
+					paginatedQuery = query.Page(unpaginatedQuery, queryMaker.Page);
 				}
 			}
-			else if (queryMaker.Page is not null
-				&& !string.IsNullOrWhiteSpace(queryMaker.Page.Index))
+			else if (queryMaker.Page is not null && !string.IsNullOrWhiteSpace(queryMaker.Page.Index))
 			{
-				IQueryable<T> sortedQuery = CreateSortedQuery(
-					filteredQuery, queryMaker.Sort);
+				IQueryable<T> sortedQuery = filteredQuery.Sort(queryMaker.Sort);
 
-				return new(CreateSelectedQuery(
-					CreateSortedQuery(
-						CreatePagedQuery(
-							query,
-							sortedQuery,
-							queryMaker.Page),
-						queryMaker.Sort),
-					queryMaker.Select),
-					CreateSelectedQuery(
-						sortedQuery,
-						queryMaker.Select));
+				paginatedQuery = query.Page(sortedQuery, queryMaker.Page).Sort(queryMaker.Sort).Select(queryMaker.Select);
+				unpaginatedQuery = sortedQuery.Select(queryMaker.Select);
 			}
 			else
 			{
-				IQueryable<T> unpaginatedQuery =
-					CreateSelectedQuery(
-						CreateSortedQuery(
-							filteredQuery,
-							queryMaker.Sort),
-						queryMaker.Select);
-
-				return new(CreatePagedQuery(
-						query,
-						unpaginatedQuery,
-						queryMaker.Page),
-					unpaginatedQuery);
+				unpaginatedQuery = filteredQuery.Sort(queryMaker.Sort).Select(queryMaker.Select);
+				paginatedQuery = query.Page(unpaginatedQuery, queryMaker.Page);
 			}
+
+			return new(paginatedQuery, unpaginatedQuery);
 		}
 
 		#endregion Internal Methods
 
 		#region Private Methods
 
-		private static IQueryable<T> CreateFilteredQuery<T>(IQueryable<T> query, Filter? filter = null)
+		private static IQueryable<T> Filter<T>(this IQueryable<T> query, Filter? filter = null)
 		{
 			if (filter is not null)
 			{
@@ -126,7 +86,7 @@ namespace QueryMakerLibrary
 			return query;
 		}
 
-		private static IQueryable<T> CreateSortedQuery<T>(IQueryable<T> query, Sort? sort = null,
+		private static IQueryable<T> Sort<T>(this IQueryable<T> query, Sort? sort = null,
 			string[]? allowedFields = null, IOrderedQueryable<T>? orderedQuery = null)
 		{
 			if (sort is not null)
@@ -140,8 +100,10 @@ namespace QueryMakerLibrary
 					&& !allowedFields.Contains(sort.Field))
 				{
 					return sort.Then is not null
-						? CreateSortedQuery(query, sort.Then, allowedFields, orderedQuery)
-						: orderedQuery is null ? query : orderedQuery;
+						? query.Sort(sort.Then, allowedFields, orderedQuery)
+						: orderedQuery is null
+							? query
+							: orderedQuery;
 				}
 
 				orderedQuery = InvokeCreateOrderedQuery(query, orderedQuery,
@@ -149,7 +111,7 @@ namespace QueryMakerLibrary
 
 				if (sort.Then is not null)
 				{
-					return CreateSortedQuery(query, sort.Then, allowedFields, orderedQuery);
+					return query.Sort(sort.Then, allowedFields, orderedQuery);
 				}
 
 				return orderedQuery;
@@ -178,7 +140,7 @@ namespace QueryMakerLibrary
 			};
 		}
 
-		private static IQueryable<T> CreateSelectedQuery<T>(IQueryable<T> query, Select? select = null)
+		private static IQueryable<T> Select<T>(this IQueryable<T> query, Select? select = null)
 		{
 			if (select is not null
 				&& select.Fields.Any())
@@ -201,7 +163,7 @@ namespace QueryMakerLibrary
 			return query;
 		}
 
-		private static IQueryable<T> CreatePagedQuery<T>(IQueryable<T> unfilteredQuery, IQueryable<T> filteredQuery, Page? page = null)
+		private static IQueryable<T> Page<T>(this IQueryable<T> unfilteredQuery, IQueryable<T> filteredQuery, Page? page = null)
 		{
 			if (page is not null)
 			{
@@ -223,7 +185,7 @@ namespace QueryMakerLibrary
 					return unfilteredQuery.Where(Expression.Lambda<Func<T, bool>>(
 						Expression.Call(
 							EnumerableMethods.GetEnumerableTypedMethod(memberExpression.Type,
-								EnumMethods.GetActionText(Filter.FilterActions.Contains)),
+								EnumMethods.GetActionText(Components.Filter.FilterActions.Contains)),
 
 							(ConstantExpression)(typeof(SelectMethods)
 								.GetMethod(nameof(SelectMethods.CreateTypedSelectConstantExpression), BindingFlags.NonPublic | BindingFlags.Static)?

@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
-using System.Reflection;
 using QueryMakerLibrary.Components;
 using QueryMakerLibrary.Constants;
+using QueryMakerLibrary.Extensions;
 using static QueryMakerLibrary.Components.Filter;
 
 namespace QueryMakerLibrary.Logic
@@ -10,7 +10,7 @@ namespace QueryMakerLibrary.Logic
 	{
 		internal static Expression? FilterAction<T>(ParameterExpression parameterExpression, Filter filter)
 		{
-			if (MemberMethods.IsEnumerableType(typeof(T)))
+			if (typeof(T).IsEnumerableType())
 			{
 				if (!EnumMethods.IsValidAction(filter.Action))
 				{
@@ -70,7 +70,7 @@ namespace QueryMakerLibrary.Logic
 
 				Expression? createdExpression = CreateExpression.ActionExpression(new(
 					field, filter.Action, filter.Negate, filter.IgnoreCase,
-					MemberMethods.GetPropertyOrField<T>(parameterExpression, field),
+                    parameterExpression.GetPropertyOrField<T>(field),
 					filter.Value));
 
 				newExpression = newExpression is null

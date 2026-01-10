@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Linq.Expressions;
 using QueryMakerLibrary.Constants;
+using QueryMakerLibrary.Extensions;
 using QueryMakerLibrary.Logic;
 using static QueryMakerLibrary.Components.Filter;
 
@@ -41,29 +42,29 @@ namespace QueryMakerLibrary
 
 		internal Expression MemberExpression
 		{
-			get =>_memberExpression ?? throw new Exception(NotNullalbleMember(nameof(MemberExpression)));
+			get => _memberExpression ?? throw new Exception(NotNullalbleMember(nameof(MemberExpression)));
 			set
 			{
 				_memberExpression = value ?? throw new Exception(NotNullalbleMember(nameof(MemberExpression)));
 
-				IsMemberEnumerable = MemberMethods.IsEnumerableType(MemberExpression.Type);
+				IsMemberEnumerable = MemberExpression.Type.IsEnumerableType();
 
 				ActualMemberType = IsMemberEnumerable
-                    ? MemberExpression.Type.GetGenericArguments()[0]
-                    : MemberMethods.GetActualType(MemberExpression.Type);
-                
+					? MemberExpression.Type.GetGenericArguments()[0]
+					: MemberExpression.Type.GetActualType();
+
 				IsMemberString = ActualMemberType == typeof(string);
 			}
 		}
 
 		internal ConstantExpression ValueExpression
 		{
-			get =>_valueExpression ?? throw new Exception(NotNullalbleMember(nameof(ValueExpression)));
+			get => _valueExpression ?? throw new Exception(NotNullalbleMember(nameof(ValueExpression)));
 			set
 			{
 				_valueExpression = value ?? throw new Exception(NotNullalbleMember(nameof(ValueExpression)));
 
-				IsValueEnumerable = MemberMethods.IsEnumerableType(ValueExpression.Type);
+				IsValueEnumerable = ValueExpression.Type.IsEnumerableType();
 			}
 		}
 

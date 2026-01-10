@@ -1,7 +1,9 @@
-using System.Linq.Expressions;
 using QueryMakerLibrary.Components;
 using QueryMakerLibrary.Constants;
+using QueryMakerLibrary.Extensions;
 using QueryMakerLibrary.Logic;
+using System.Linq.Expressions;
+using System.Reflection;
 using static QueryMakerLibrary.Components.Sort;
 
 namespace QueryMakerLibrary
@@ -142,22 +144,8 @@ namespace QueryMakerLibrary
 						: orderedQuery is null ? query : orderedQuery;
 				}
 
-				Expression<Func<T, object>> selectExpression = SelectMethods.CreateSelectExpression<T>(
-						Expression.Parameter(typeof(T), Miscellaneous.INSTANCE),
-						sort.Field);
-
-				orderedQuery = sort.Direction switch
-				{
-					SortDirections.Ascending => orderedQuery is null
-						? query.OrderBy(selectExpression)
-						: orderedQuery.ThenBy(selectExpression),
-
-					SortDirections.Descending => orderedQuery is null
-						? query.OrderByDescending(selectExpression)
-						: orderedQuery.ThenByDescending(selectExpression),
-
-					_ => throw Errors.Exception(Errors.InvalidSortingDirection, sort.Direction)
-				};
+				orderedQuery = InvokeCreateOrderedQuery(query, orderedQuery,
+					Expression.Parameter(typeof(T), Miscellaneous.INSTANCE), sort.Field, sort.Direction);
 
 				if (sort.Then is not null)
 				{
@@ -168,6 +156,26 @@ namespace QueryMakerLibrary
 			}
 
 			return query;
+		}
+
+		private static IOrderedQueryable<T> CreateOrderedQuery<T, U>(IQueryable<T> query,
+			IOrderedQueryable<T>? orderedQuery, ParameterExpression parameterExpression,
+			string field, SortDirections sortDirection)
+		{
+			Expression<Func<T, U>> selectExpression = SelectMethods.CreateSelectExpression<T, U>(parameterExpression, field);
+
+			return sortDirection switch
+			{
+				SortDirections.Ascending => orderedQuery is null
+					? query.OrderBy(selectExpression)
+					: orderedQuery.ThenBy(selectExpression),
+
+				SortDirections.Descending => orderedQuery is null
+					? query.OrderByDescending(selectExpression)
+					: orderedQuery.ThenByDescending(selectExpression),
+
+				_ => throw Errors.Exception(Errors.InvalidSortingDirection, sortDirection)
+			};
 		}
 
 		private static IQueryable<T> CreateSelectedQuery<T>(IQueryable<T> query, Select? select = null)
@@ -210,14 +218,19 @@ namespace QueryMakerLibrary
 				if (!string.IsNullOrWhiteSpace(page.Index))
 				{
 					ParameterExpression parameterExpression = Expression.Parameter(typeof(T), Miscellaneous.INSTANCE);
-					MemberExpression memberExpression = MemberMethods.GetPropertyOrField<T>(parameterExpression, page.Index);
+					MemberExpression memberExpression = parameterExpression.GetPropertyOrField<T>(page.Index);
 
 					return unfilteredQuery.Where(Expression.Lambda<Func<T, bool>>(
 						Expression.Call(
 							EnumerableMethods.GetEnumerableTypedMethod(memberExpression.Type,
 								EnumMethods.GetActionText(Filter.FilterActions.Contains)),
-							SelectMethods.CreateTypedSelectConstantExpression(filteredQuery, memberExpression.Type.Name,
-								parameterExpression, page.Index),
+
+							(ConstantExpression)(typeof(SelectMethods)
+								.GetMethod(nameof(SelectMethods.CreateTypedSelectConstantExpression), BindingFlags.NonPublic | BindingFlags.Static)?
+								.MakeGenericMethod(new Type[] { typeof(T), memberExpression.Type })?
+								.Invoke(null, new object?[] { filteredQuery, parameterExpression, page.Index })
+									?? throw Errors.Exception(Errors.CreateTypedSelectConstantExpression)),
+
 							memberExpression),
 						parameterExpression));
 				}
@@ -227,5 +240,22 @@ namespace QueryMakerLibrary
 		}
 
 		#endregion Private Methods
+
+		#region Helpers
+
+		private static IOrderedQueryable<T> InvokeCreateOrderedQuery<T>(IQueryable<T> query,
+			IOrderedQueryable<T>? orderedQuery, ParameterExpression parameterExpression,
+			string field, SortDirections sortDirection)
+		{
+			MethodInfo? createOrderedQueryMethod = typeof(PerformActions)
+				.GetMethod(nameof(CreateOrderedQuery), BindingFlags.NonPublic | BindingFlags.Static)?
+				.MakeGenericMethod(new Type[] { typeof(T), parameterExpression.GetPropertyOrField<T>(field).Type });
+
+			return (IOrderedQueryable<T>?)createOrderedQueryMethod?.Invoke(null,
+				new object?[]{ query, orderedQuery, parameterExpression, field, sortDirection })
+				?? throw Errors.Exception(Errors.CreateOrderedQuery);
+		}
+
+		#endregion Helpers
 	}
 }

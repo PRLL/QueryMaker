@@ -21,6 +21,8 @@ namespace QueryMakerLibrary.Constants
 			DistincByAfterSelect = "Tried using 'DistinctBy' and 'Select' together, but some fields sent on 'DistinctBy' are missing from 'Select'",
 			ListToListNotImplemeneted = "{0} list to list content evaluation expression not implemented yet",
 			ExpressionValueToList = "Error ocurred converting expression value to List",
+			CreateOrderedQuery = "Error ocurred creating ordered query",
+			CreateTypedSelectConstantExpression = "Error ocurred creating constant expression",
 			NoPropertyOrField = "{0} does not contain property or field {1}",
 			ActionText = "Not Text Implemented",
 			NotNullableMember = "Value for Member {0} cannot be null for class {1}",

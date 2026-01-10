@@ -2,6 +2,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Text.Json;
 using QueryMakerLibrary.Constants;
+using QueryMakerLibrary.Extensions;
 
 namespace QueryMakerLibrary.Logic
 {
@@ -18,7 +19,7 @@ namespace QueryMakerLibrary.Logic
 			else
 			{
 				TypeConverter converter = TypeDescriptor.GetConverter(propertyType);
-				if (MemberMethods.IsEnumerableType(value.GetType()))
+				if (value.GetType().IsEnumerableType())
 				{
 					List<object?> objectsList = new();
 					foreach (object? item in (value as IEnumerable) ?? throw Errors.Exception(Errors.ExpressionValueToList))

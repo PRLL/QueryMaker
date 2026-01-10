@@ -2,6 +2,7 @@ using System.Collections;
 using System.Linq.Expressions;
 using System.Reflection;
 using QueryMakerLibrary.Constants;
+using QueryMakerLibrary.Extensions;
 using static QueryMakerLibrary.Components.Filter;
 
 namespace QueryMakerLibrary.Logic
@@ -31,6 +32,7 @@ namespace QueryMakerLibrary.Logic
 					: value);
 
 			bool isMemberExpressionStringType = typedMemberExpression.Type == typeof(string);
+			bool isMemberExpressionNullableType = typedMemberExpression.Type.IsNullableType();
 
             if (valueIsNull)
             {
@@ -38,14 +40,14 @@ namespace QueryMakerLibrary.Logic
                 {
                     typedValueExpression = Expression.Constant("null");
                 }
-                else if (!MemberMethods.IsNullableType(typedMemberExpression.Type))
+                else if (!isMemberExpressionNullableType)
                 {
                     typedMemberExpression = Expression.Convert(typedMemberExpression, typeof(Nullable<>).MakeGenericType(typedMemberExpression.Type));
                 }
             }
 
-			if (MemberMethods.IsNullableType(typedMemberExpression.Type)
-				&& !MemberMethods.IsNullableType(typedValueExpression.Type))
+			if (isMemberExpressionNullableType
+                && !typedValueExpression.Type.IsNullableType())
 			{
                 typedValueExpression = Expression.Convert(typedValueExpression, typedMemberExpression.Type);
             }
@@ -94,8 +96,8 @@ namespace QueryMakerLibrary.Logic
 
 				case FilterActions.GreaterThan: case FilterActions.LessThan:
 				case FilterActions.GreaterThanOrEqual: case FilterActions.LessThanOrEqual:
-					if (MemberMethods.GetActualType(typedMemberExpression.Type) == typeof(bool)
-						&& MemberMethods.GetActualType(typedValueExpression.Type) == typeof(bool))
+					if (typedMemberExpression.Type.GetActualType() == typeof(bool)
+						&& typedValueExpression.Type.GetActualType() == typeof(bool))
 					{
 						typedMemberExpression = Expression.Convert(
 							actionExpression.MemberExpression,

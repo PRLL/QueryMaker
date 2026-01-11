@@ -72,7 +72,7 @@ namespace QueryMakerLibrary.Logic
 				case FilterActions.EndsWith: case FilterActions.NotEndsWith:
 					evaluationExpression = Expression.Call(
 						typedMemberExpression,
-						EnumMethods.GetActionText(actionExpression.Action),
+						actionExpression.Action.GetActionText(),
 						null,
 						typedValueExpression);
 

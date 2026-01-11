@@ -185,7 +185,7 @@ namespace QueryMakerLibrary
 					return unfilteredQuery.Where(Expression.Lambda<Func<T, bool>>(
 						Expression.Call(
 							EnumerableMethods.GetEnumerableTypedMethod(memberExpression.Type,
-								EnumMethods.GetActionText(Components.Filter.FilterActions.Contains)),
+								Components.Filter.FilterActions.Contains.GetActionText()),
 
 							(ConstantExpression)(typeof(SelectMethods)
 								.GetMethod(nameof(SelectMethods.CreateTypedSelectConstantExpression), BindingFlags.NonPublic | BindingFlags.Static)?

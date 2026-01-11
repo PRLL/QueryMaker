@@ -12,7 +12,7 @@ namespace QueryMakerLibrary.Logic
 		{
 			if (typeof(T).IsEnumerableType())
 			{
-				if (!EnumMethods.IsValidAction(filter.Action))
+				if (!filter.Action.IsValid())
 				{
 					throw Errors.Exception(Errors.FilterInvalidAction);
 				}
@@ -26,7 +26,7 @@ namespace QueryMakerLibrary.Logic
 
 			if (filter.SubFilters.Any())
 			{
-				if (!EnumMethods.IsValidOperation(filter.SubFiltersOperation))
+				if (!filter.SubFiltersOperation.IsValid())
 				{
 					throw Errors.Exception(Errors.InvalidOperationValue, filter.SubFiltersOperation);
 				}
@@ -56,14 +56,14 @@ namespace QueryMakerLibrary.Logic
 					parameterExpression, filter.Value));
 			}
 
-			if (filter.Fields.Length > 1 && !EnumMethods.IsValidOperation(filter.FieldsOperation))
+			if (filter.Fields.Length > 1 && !filter.FieldsOperation.IsValid())
 			{
 				throw Errors.Exception(Errors.MultipleFieldsNoOperation);
 			}
 
 			foreach (string field in filter.Fields)
 			{
-				if (!EnumMethods.IsValidAction(filter.Action))
+				if (!filter.Action.IsValid())
 				{
 					throw Errors.Exception(Errors.FilterInvalidAction);
 				}

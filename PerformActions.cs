@@ -114,7 +114,7 @@ namespace QueryMakerLibrary
 					return query.Sort(sort.Then, allowedFields, orderedQuery);
 				}
 
-				return orderedQuery;
+				return orderedQuery ?? query;
 			}
 
 			return query;

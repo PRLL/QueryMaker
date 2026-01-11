@@ -160,4 +160,4 @@ Project Link: [https://github.com/PRLL/QueryMaker](https://github.com/PRLL/Query
 
 ## Copyright
 
-©Jose Toyos 2023
+©Jose Toyos 2026
